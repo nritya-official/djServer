@@ -1,0 +1,7 @@
+MAC OS, LINUX
+source server/bin/backend
+
+WINDOWS in cmd
+backend\Scripts\activate.bat
+
+python manage.py runserver
