@@ -19,6 +19,7 @@ def update_cache_periodically():
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djServer.settings')
+    logging.info("Inside main")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -29,6 +30,8 @@ def main():
         ) from exc
 
     # Start the caching thread
+    logging.info("From main")
+    logging.info(sys.argv[1])
     if(sys.argv[1]=='runserver'):
         print("Running server so threading for cache")
         logging.info("Threading for cache..")
