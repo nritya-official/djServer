@@ -18,6 +18,7 @@ def update_cache_periodically():
 
 def main():
     """Run administrative tasks."""
+    
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djServer.settings')
     logging.info("Inside main")
     try:
