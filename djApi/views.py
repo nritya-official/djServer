@@ -5,12 +5,16 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from .processor import cache, full_text_search
 from fuzzywuzzy import fuzz
+import logging
+logging.basicConfig(level=logging.INFO)  # Set the desired logging level
+
 
 def landing_page(request):
     return JsonResponse("Hello User! For more check /help", safe=False)
 
 def get_all_data(request):
     # Assuming cache is a global variable
+    logging.info("get all data called")
     return JsonResponse(cache, safe=False)
 
 def search(request):
