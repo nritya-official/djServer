@@ -15,6 +15,7 @@ def landing_page(request):
 def get_all_data(request):
     # Assuming cache is a global variable
     logging.info("get all data called")
+    logging.info(cache)
     return JsonResponse(cache, safe=False)
 
 def search(request):
