@@ -1,10 +1,13 @@
 import firebase_admin.firestore
 import json
 from fuzzywuzzy import fuzz
+import logging
+logging.basicConfig(level=logging.INFO)
 
 cache = {}
 def update_cache():
     print("Cache updating....")
+    logging.info("Cache updating...")
     try:
         db = firebase_admin.firestore.client()
         docs = db.collection('Studio').stream()
@@ -26,8 +29,10 @@ def update_cache():
         cache.clear()
         cache.update(data_source)
         print("Cache updated successfully")
+        logging.info("Cache updated successfully")
     except Exception as e:
         print("Error updating cache:", e)
+        logging.error("Error updating cache : ",e)
 
 def autocomplete(cache, query):
     results = []
