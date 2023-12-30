@@ -1,5 +1,5 @@
 MAC OS, LINUX
-source backend/bin/activate
+source ../backend/bin/activate
 
 WINDOWS in cmd
 backend\Scripts\activate.bat

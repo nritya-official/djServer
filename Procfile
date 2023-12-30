@@ -1,1 +1,1 @@
-web: gunicorn djServer.wsgi --config gunicorn_config.py
+web: sh setup.sh && gunicorn djServer.wsgi --config gunicorn_config.py

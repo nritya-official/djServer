@@ -1,13 +1,17 @@
 import firebase_admin.firestore
 import json
 from fuzzywuzzy import fuzz
+import redis
 import logging
+from django.core.cache import cache
+
 logging.basicConfig(level=logging.INFO)
 
-cache = {}
-def update_cache():
+#cache = {}
+def update_cache(rc):
     print("Cache updating....")
     logging.info("Cache updating...")
+
     try:
         db = firebase_admin.firestore.client()
         docs = db.collection('Studio').stream()
@@ -25,9 +29,7 @@ def update_cache():
             #data_source[doc.id].data["studioId"]=doc.id
 
         data_source_json = json.dumps(data_source)
-        print(data_source_json)
-        cache.clear()
-        cache.update(data_source)
+        rc.set('studio_data', data_source_json)  
         print("Cache updated successfully")
         logging.info("Cache updated successfully")
     except Exception as e:
@@ -50,7 +52,7 @@ def filter_by_city(data, city):
 def filter_by_dance_style(data, dance_style):
     return dance_style is None or data.get("danceStyles", "").lower() == dance_style.lower()
 
-def full_text_search(query, city='', dance_style=''):
+def full_text_search(query, city='', dance_style='',cache={}):
     print(query)
     results = []
     query_tokens = query.lower().split()  # Tokenize search query

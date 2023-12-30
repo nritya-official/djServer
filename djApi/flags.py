@@ -2,7 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 
-CACHE_UPDATE_INTERVAL = 3600
+CACHE_UPDATE_INTERVAL = 600
 FIREBASE_CREDENTIALS = credentials.Certificate('djApi/config.json')
 FIREBASE_APP = None
 

@@ -142,4 +142,3 @@ LOGGING = {
         'level': 'INFO',  # Set the desired logging level
     },
 }
-
