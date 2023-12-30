@@ -14,6 +14,9 @@ rc = redis.Redis(
     username="default", # use your Redis user. More info https://redis.io/docs/management/security/acl/
     password="Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi", # use your Redis password
     )
+rc.set("foo","bar")
+logging.info("hiii")
+logging.info(rc.get("foo"))
 
 def on_starting(server):
     logging.info("gunicorn")
@@ -23,6 +26,7 @@ def on_starting(server):
     cache_update_thread.start()
 
 def update_cache_periodically():
+    logging.info("update cache ")
     while True:
         update_cache(rc)
         time.sleep(flags.CACHE_UPDATE_INTERVAL)  # Sleep for 10 minutes
