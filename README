@@ -8,3 +8,4 @@ python manage.py runserver
 
 heroku login
 heroku ps:scale web=1 -a nrityaserver
+pip freeze > requirements.txt
