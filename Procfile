@@ -1,1 +1,1 @@
-gunicorn djServer.wsgi --config gunicorn_config.py
+web: gunicorn djServer.wsgi --config gunicorn_config.py
