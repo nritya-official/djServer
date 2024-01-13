@@ -37,8 +37,19 @@ def search(request):
     query = request.GET.get("query", "")
     city = request.GET.get("city", "")
     dance_style = request.GET.get("danceStyle", "")
-    results = full_text_search(query, city, dance_style, json.loads(rc.get('studio_data')))
-    return JsonResponse(results, safe=False)
+
+    try:
+        cache_key = city.lower()
+        cached_data = json.loads(rc.get(cache_key) or '[]')
+        logging.info(cache_key)
+        logging.info(cached_data)
+        results = full_text_search(query, dance_style, cached_data)
+        return JsonResponse(results, safe=False)
+    except Exception as e:
+        logging.error("Error searching: ", e)
+        return JsonResponse({"error": "Internal Server Error"}, status=500)
+
+
 
 def autocomplete(request):
     query = request.GET.get("query", "")

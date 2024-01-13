@@ -8,7 +8,7 @@ from django.core.cache import cache
 logging.basicConfig(level=logging.INFO)
 
 #cache = {}
-def update_cache(rc):
+def update_cache1(rc):
     print("Cache updating....")
     logging.info("Cache updating...")
 
@@ -26,15 +26,55 @@ def update_cache(rc):
                     data[field] = value
             data["studioId"]=doc.id
             data_source[doc.id] = data
+            city = data.get("city", "")
+            logging.info(city)
             #data_source[doc.id].data["studioId"]=doc.id
 
         data_source_json = json.dumps(data_source)
         rc.set('studio_data', data_source_json)  
-        print("Cache updated successfully")
+        print("Cache updated successfully",data_source_json)
         logging.info("Cache updated successfully")
     except Exception as e:
         print("Error updating cache:", e)
         logging.error("Error updating cache : ",e)
+
+def update_cache(rc):
+    print("Cache updating....")
+    logging.info("Cache updating...")
+
+    try:
+        db = firebase_admin.firestore.client()
+        docs = db.collection('Studio').stream()
+        data_source = {}
+
+        for doc in docs:
+            data = {}
+            for field, value in doc.to_dict().items():
+                if isinstance(value, firebase_admin.firestore.DocumentReference):
+                    data[field] = value.id
+                else:
+                    data[field] = value
+            data["studioId"] = doc.id
+
+            # Organize data by city in the cache
+            city = data.get("city", "")
+            if city:
+                if city not in data_source:
+                    data_source[city] = []
+                data_source[city].append(data)
+        logging.info(data_source)
+        for city, studios in data_source.items():
+            rc.set(city.lower(), json.dumps(studios))
+            cached_data = rc.get(city.lower())
+            logging.info(json.loads(cached_data) if cached_data else [])
+
+
+        print("Cache updated successfully")
+        #logging.info("Cache updated successfully",data_source)
+    except Exception as e:
+        print("Error updating cache:", e)
+        logging.error("Error updating cache: ", e)
+
 
 def autocomplete(cache, query):
     results = []
@@ -52,13 +92,55 @@ def filter_by_city(data, city):
 def filter_by_dance_style(data, dance_style):
     return dance_style is None or data.get("danceStyles", "").lower() == dance_style.lower()
 
-def full_text_search(query, city='', dance_style='',cache={}):
+
+def full_text_search(query, dance_style='', cache=[]):
+    logging.info("FTS")
+    logging.info(len(cache))
+    results = []
+    query_tokens = query.lower().split()  # Tokenize search query
+    dance_style_filters = set(map(str.strip, dance_style.lower().split(',')))
+
+
+    for data in cache:
+        # Check if the danceStyle filter is satisfied
+        studio_dance_styles = set(map(str.strip, data.get("danceStyles", "").lower().split(',')))
+        dance_styles_tokens = data.get("danceStyles", "").lower().split(',')
+
+        if len(query)==0 and len(dance_style)==0:
+            results.append(data)
+            continue
+
+        if dance_style_filters:
+            studio_name_tokens = data.get("studioName", "").lower().split()
+            dance_style_filter_matched = not dance_style_filters or dance_style_filters.intersection(studio_dance_styles)
+
+            if dance_style_filter_matched:
+                results.append(data)
+                continue
+
+
+            # Check if any token in the query partially matches any token in danceStyles or studioName
+            if any(
+                fuzz.partial_ratio(query_token, dance_style_token) >= 70 or
+                fuzz.partial_ratio(query_token, studio_name_token) >= 76
+                for query_token in query_tokens
+                for dance_style_token in dance_styles_tokens
+                for studio_name_token in studio_name_tokens
+            ):
+                results.append(data)
+
+    print(len(results))
+    return results
+
+
+def full_text_search1(query, city='', dance_style='',cache={}):
     print(query)
     results = []
     query_tokens = query.lower().split()  # Tokenize search query
 
     for key, data in cache.items():
         # Check if both the city and danceStyle filters are satisfied
+        # city -> danceStyle-> query
         city_filter = (city is None) or (data.get("city", "").lower() == city.lower())
         dance_style_filter = (dance_style is None) or (data.get("danceStyles", "").lower() == dance_style.lower())
 
@@ -73,7 +155,7 @@ def full_text_search(query, city='', dance_style='',cache={}):
         if processFurther:
             dance_styles_tokens = data.get("danceStyles", "").lower().split(',')
             studio_name_tokens = data.get("studioName", "").lower().split()
-            if len(query_tokens) == 0:
+            if len(query_tokens) ==0 :
                 results.append(data)
                 print("Adding...")
                 continue
