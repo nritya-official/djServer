@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 def update_cache1(rc):
     print("Cache updating....")
     logging.info("Cache updating...")
-
+    x = True
     try:
         db = firebase_admin.firestore.client()
         docs = db.collection('Studio').stream()
@@ -20,10 +20,12 @@ def update_cache1(rc):
         for doc in docs:
             data = {}
             for field, value in doc.to_dict().items():
+                logging.info(str(field))
                 if isinstance(value, firebase_admin.firestore.DocumentReference):
                     data[field] = value.id
                 else:
                     data[field] = value
+            x = False
             data["studioId"]=doc.id
             data_source[doc.id] = data
             city = data.get("city", "")
@@ -41,7 +43,7 @@ def update_cache1(rc):
 def update_cache(rc):
     print("Cache updating....")
     logging.info("Cache updating...")
-
+    x = True
     try:
         db = firebase_admin.firestore.client()
         docs = db.collection('Studio').stream()
@@ -50,19 +52,21 @@ def update_cache(rc):
         for doc in docs:
             data = {}
             for field, value in doc.to_dict().items():
-                if isinstance(value, firebase_admin.firestore.DocumentReference):
-                    data[field] = value.id
-                else:
-                    data[field] = value
+                allowed_fields = ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId']
+                if field in allowed_fields:
+                    if isinstance(value, firebase_admin.firestore.DocumentReference):
+                        data[field] = value.id
+                    else:
+                        data[field] = value
             data["studioId"] = doc.id
-
+            x =  False
             # Organize data by city in the cache
             city = data.get("city", "")
+            logging.info(city)
             if city:
                 if city not in data_source:
                     data_source[city] = []
                 data_source[city].append(data)
-        logging.info(data_source)
         for city, studios in data_source.items():
             rc.set(city.lower(), json.dumps(studios))
             cached_data = rc.get(city.lower())
@@ -70,6 +74,7 @@ def update_cache(rc):
 
 
         print("Cache updated successfully")
+        logging.info(data_source)
         #logging.info("Cache updated successfully",data_source)
     except Exception as e:
         print("Error updating cache:", e)
