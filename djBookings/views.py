@@ -11,6 +11,7 @@ import logging
 import firebase_admin.firestore
 import threading
 import time
+from django.urls import reverse
 
 def bookingsTest(request):
     logging.info("Hello")
@@ -131,6 +132,36 @@ def freeTrial3(request):
         logging.info(request.method)
         return JsonResponse("This is the free trial endpoint. Send a POST request to start the free trial.",safe=False)
 
+
+def availFreeTrial(request,booking_id):
+    logging.info(f"Free Trial {booking_id}")
+    db = FIREBASE_DB
+    doc_ref = db.collection(COLLECTIONS.FREE_TRIAL_BOOKINGS).document(str(booking_id))
+
+    doc = doc_ref.get()
+    if doc.exists:
+        booking_data = doc.to_dict()
+        logging.info(f"Booking exists data: {doc.to_dict()}")
+        # Check if validated already
+        if 'used' in booking_data and booking_data['used']:
+            return JsonResponse({'Booking Id': booking_id, 'Status': 'Already Validated'})
+
+        # Check if expired (assuming you have a 'expiry_date' field in your data)
+        if 'timestamp' in booking_data:
+            expiration_time = float(booking_data['timestamp'])*1000 + 12*60
+            if expiration_time < time.time():
+                return JsonResponse({'Booking Id': booking_id, 'Status': 'Expired'})
+            doc_ref.set({"used": True,"used_at":time.time()}, merge=True)
+            return JsonResponse({'Booking Id': booking_id, 'Status': 'Valid Booking, Enjoy your free class.'})
+
+    else:
+        logging.info("No such bookings")
+        return JsonResponse({'Booking Id': booking_id,'Status':'Invalid Booking Id'})
+
+
+    # Check if exists
+    # Check if validated already
+    # Check if expired
 
 @csrf_exempt
 def freeTrial(request):
