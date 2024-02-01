@@ -148,7 +148,7 @@ def availFreeTrial(request,booking_id):
 
         # Check if expired (assuming you have a 'expiry_date' field in your data)
         if 'timestamp' in booking_data:
-            expiration_time = (float(booking_data['timestamp'])*1000 + 12*60)/1000
+            expiration_time = (float(booking_data['timestamp']) + 12*3600)
             logging.info(expiration_time)
             logging.info(time.time())
             if expiration_time < time.time():
