@@ -1,0 +1,45 @@
+/* styles.css */
+body {
+    font-family: Helvetica, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .ticket-container {
+    text-align: center;
+    border: 2px solid #000000; /* Add border for a card-like appearance */
+    border-radius: 10px; /* Add border-radius for rounded corners */
+    padding: 20px;
+    max-width: 400px; /* Set a maximum width for the card */
+    width: 100%; /* Ensure the card doesn't exceed 100% width */
+  }
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .logo {
+    width: 3.0rem;
+    height: 3.0rem;
+    border: 2px solid black;
+    border-radius: 50%;
+  }
+  .booking-details {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .qr-code {
+  margin-top: 10px; 
+  text-align: center;
+}
+.qr-code img {
+width: 25% !important;
+height: auto !important;
+border: 2px solid black !important;
+border-radius: 5px !important;
+}
+  

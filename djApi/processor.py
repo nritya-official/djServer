@@ -4,7 +4,7 @@ from fuzzywuzzy import fuzz
 import redis
 import logging
 from django.core.cache import cache
-
+from djApi.flags import FIREBASE_DB
 logging.basicConfig(level=logging.INFO)
 
 #cache = {}

@@ -1,0 +1,115 @@
+<!-- ticket_template.html -->
+<html>
+<head>
+  <title>Booking Ticket</title>
+  <style>
+    .card {
+      width: 300px;
+      border-radius: 10px;
+      margin: 70px;
+      background: #17181D;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .card-header {
+      height: 55%; 
+      border: 2px solid #836602;
+      border-bottom: 2px dotted #836602;
+      border-radius: 10px 10px 0 0;
+      position: relative;
+      text-align: center;
+
+    }
+
+    .card-header:before,
+    .card-header:after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: #fff;
+      border-radius: 100%;
+      bottom: -12px;
+      border: 2px solid #836602;
+      box-sizing: border-box;
+    }
+
+    .card-header:before {
+      left: -13px;
+    }
+
+    .card-header:after {
+      right: -13px;
+    }
+
+    .card-body {
+      height: 45%; 
+      padding: 20px;
+      text-align: center;
+      border: 2px solid #836602;
+      border-top: none;
+      border-radius: 0px 0px 10px 10px;
+    }
+
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .logo {
+      width: 3.0rem;
+      height: 3.0rem;
+      border: 2px solid black;
+      border-radius: 50%;
+    }
+
+    .qr-code {
+    margin-top: 10px; 
+    text-align: center;
+  }
+    .qr-code img {
+    width: 25% !important;
+    height: auto !important;
+    border: 2px solid black !important;
+    border-radius: 5px !important;
+  }
+  .text{
+    color: #E09145;
+  }
+
+    /* Add other styles as needed */
+
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="logo-container">
+        <div class="logo">
+          <img src="data:image/png;base64,{{ logo_base64 }}"  alt="Organization Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        </div>
+      </div>
+      <h3 class="text"> {{studio_name}}</h3>
+      <p class="text"> {{class_name}}</p>
+      <p class="text"> {{address}} </p>
+      <p class="text"> Timing: {{studio_timing}} on {{studio_days}}</p>
+
+    </div>
+    <div class="card-body">
+
+      <p class="text">Booked by: {{customer_name}}</p>
+
+      <div class="qr-code">
+        <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="QR Code">
+      </div>
+
+      <p class="text">Bookings Id: QWERTYXYZ123</p>
+      <p class="text"> Valid till 3 days from {{timestamp_c}}</p>
+    </div>
+  </div>
+</body>
+</html>
