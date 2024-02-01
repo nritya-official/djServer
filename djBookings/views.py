@@ -4,8 +4,8 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt  
 from djApi.flags import FIREBASE_DB, COLLECTIONS, nSuccessCodes
-#from sendEmailServices.email_main import send_emails
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
+from .flags import FLAGS
 import json
 import logging
 import firebase_admin.firestore
@@ -44,7 +44,7 @@ def _get_studio_info(studio_id, classIndex):
         logging.info(f"Studio Document data: {name_studio} {email_studio} {name_class}")
     else:
         logging.info("No such document of studio!")
-
+'''
 @csrf_exempt
 def freeTrial2(request):
     logging.info("Free Trial")
@@ -132,7 +132,7 @@ def freeTrial3(request):
         logging.info(request.method)
         return JsonResponse("This is the free trial endpoint. Send a POST request to start the free trial.",safe=False)
 
-
+'''
 def availFreeTrial(request,booking_id):
     logging.info(f"Free Trial {booking_id}")
     db = FIREBASE_DB
@@ -148,7 +148,7 @@ def availFreeTrial(request,booking_id):
 
         # Check if expired (assuming you have a 'expiry_date' field in your data)
         if 'timestamp' in booking_data:
-            expiration_time = (float(booking_data['timestamp']) + 12*3600)
+            expiration_time = (float(booking_data['timestamp']) + FLAGS.EXPIRES_WITHIN_DAYS*FLAGS.DAYS_TO_SEC)
             logging.info(expiration_time)
             logging.info(time.time())
             if expiration_time < time.time():
