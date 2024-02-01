@@ -148,7 +148,9 @@ def availFreeTrial(request,booking_id):
 
         # Check if expired (assuming you have a 'expiry_date' field in your data)
         if 'timestamp' in booking_data:
-            expiration_time = float(booking_data['timestamp'])*1000 + 12*60
+            expiration_time = (float(booking_data['timestamp'])*1000 + 12*60)/1000
+            logging.info(expiration_time)
+            logging.info(time.time())
             if expiration_time < time.time():
                 return JsonResponse({'Booking Id': booking_id, 'Status': 'Expired'})
             doc_ref.set({"used": True,"used_at":time.time()}, merge=True)
@@ -158,10 +160,6 @@ def availFreeTrial(request,booking_id):
         logging.info("No such bookings")
         return JsonResponse({'Booking Id': booking_id,'Status':'Invalid Booking Id'})
 
-
-    # Check if exists
-    # Check if validated already
-    # Check if expired
 
 @csrf_exempt
 def freeTrial(request):
