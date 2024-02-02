@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+        font-family: 'Quicksand', sans-serif;
+        color: #324e63;
+        }
+
+        .wrapper{
+        width: 100%;
+        height: 100%;
+        min-height: 100vh;
+        display: flex;
+        background-image: linear-gradient(to right top, #051937, #1b313e, #334041, #090909, #383f2a);
+        justify-content: center;
+        align-items: center;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        }
+
+        .card-outer {
+        background-color: rgb(255, 255, 255,0);
+        padding-top: 5rem;
+        width: 30rem;
+        height: 35rem;
+        justify-content: center;
+        align-items: center;
+        }
+
+        .card-inner {
+            background-color: rgb(255, 255, 255,1);
+            border-radius: 0.5rem;
+            width: 30rem;
+            height: 35rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-inner img{
+        background-image: url('logo.png');
+        border-radius: 50%;
+        height: 10rem;
+        margin-top: -5rem;
+        margin-left: 10rem;
+        padding: 0.2rem;
+        width: 10rem;
+        }
+
+        .container {
+        width: 100%;
+        margin: 0 auto;
+        padding: 2px;
+        box-sizing: border-box;
+        text-align: center; 
+        }
+
+        .box-text {
+        margin-bottom: 0.5rem; 
+        padding: 1rem;
+        box-sizing: border-box;
+        text-align: center; 
+        }
+
+        .box-circle-failure { 
+        margin-bottom: 0.5rem; 
+        padding: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+
+
+        .circle-failure,
+        .circle-failure-border {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        }
+        .circle-failure {
+        z-index: 1;
+        position: relative;
+        background: white;
+        transform: scale(1);
+        animation: failure-anim 700ms ease;
+        }
+
+        .circle-failure-border {
+        z-index: 0;
+        position: absolute;
+        background: rgb(255, 112, 102);
+        transform: scale(1.1);
+        animation: circle-failure-anim 400ms ease;
+        }
+
+        @keyframes failure-anim {
+        0% {
+            transform: scale(0);
+        }
+        30% {
+            transform: scale(0);
+        }
+        100% {
+            transform: scale(1);
+        }
+        }
+
+        @keyframes circle-failure-anim {
+        from {
+            transform: scale(0);
+        }
+        to {
+            transform: scale(1.1);
+        }
+        }
+
+        .failure::before,
+        .failure::after {
+        content: "";
+        display: block;
+        height: 4px;
+        background: rgb(238, 18, 6);
+        position: absolute;
+        }
+
+        .failure::before {
+        width: 30px;
+        top: 50%;
+        left: 23%;
+        transform: rotateZ(50deg);
+        }
+
+        .failure::after {
+        width: 30px;
+        top: 50%;
+        left: 23%;
+        transform: rotateZ(-50deg);
+        }
+
+    </style>
+   
+
+    <title>Free Trial Verification</title>
+</head>
+<body>
+    <div class="wrapper ">
+        <div class="card-outer ">
+            <div class="card-inner ">
+
+                <img src=" data:image/png;base64,{{ encoded_string_logo }}" alt="My image">
+
+                    <div class="container">
+                        <div class="box-text">
+                            <h1>Invalid Booking ID</h1>
+                            <p>Booking Id: {{ booking_id }}</p>
+                            <p>The provided booking ID is incorrect. Please check your ticket.</p>
+                        </div>
+                        <div class="box-circle-failure">
+                            <div class="circle-failure-border"></div>
+                                <div class="circle-failure">
+                                    <div class="failure"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>

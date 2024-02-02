@@ -12,6 +12,10 @@ import firebase_admin.firestore
 import threading
 import time
 from django.urls import reverse
+from django.http import HttpResponse
+from django.template import loader
+import base64
+import os
 
 def bookingsTest(request):
     logging.info("Hello")
@@ -134,9 +138,12 @@ def freeTrial3(request):
 
 '''
 def availFreeTrial(request,booking_id):
+    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo.png')
     logging.info(f"Free Trial {booking_id}")
     db = FIREBASE_DB
     doc_ref = db.collection(COLLECTIONS.FREE_TRIAL_BOOKINGS).document(str(booking_id))
+    with open(logo_path, 'rb') as image_file:
+        encoded_string_logo = base64.b64encode(image_file.read()).decode('utf-8')
 
     doc = doc_ref.get()
     if doc.exists:
@@ -144,7 +151,8 @@ def availFreeTrial(request,booking_id):
         logging.info(f"Booking exists data: {doc.to_dict()}")
         # Check if validated already
         if 'used' in booking_data and booking_data['used']:
-            return JsonResponse({'Booking Id': booking_id, 'Status': 'Already Validated'})
+            return render(request, 'case4a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Invalid Booking Id'})
+            #return JsonResponse({'Booking Id': booking_id, 'Status': 'Valid Booking but Already used'})
 
         # Check if expired (assuming you have a 'expiry_date' field in your data)
         if 'timestamp' in booking_data:
@@ -152,13 +160,17 @@ def availFreeTrial(request,booking_id):
             logging.info(expiration_time)
             logging.info(time.time())
             if expiration_time < time.time():
-                return JsonResponse({'Booking Id': booking_id, 'Status': 'Expired'})
+                return render(request, 'case3a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Invalid Booking Id'})
+                #return JsonResponse({'Booking Id': booking_id, 'Status': 'Valid booking but Expired'})
             doc_ref.set({"used": True,"used_at":time.time()}, merge=True)
-            return JsonResponse({'Booking Id': booking_id, 'Status': 'Valid Booking, Enjoy your free class.'})
+            return render(request, 'case1a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Invalid Booking Id'})
+            #return JsonResponse({'Booking Id': booking_id, 'Status': 'Valid Booking, Enjoy your free class now.'})
 
     else:
         logging.info("No such bookings")
-        return JsonResponse({'Booking Id': booking_id,'Status':'Invalid Booking Id'})
+        return render(request, 'case2a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Invalid Booking Id'})
+        #return render(request, 'case2a.html', {'booking_id': booking_id, 'status': 'Invalid Booking Id'})  /home/ayush/Downloads/FreeTrialCases
+        #return JsonResponse({'Booking Id': booking_id,'Status':'Invalid Booking Id'}) #invalid
 
 
 @csrf_exempt
