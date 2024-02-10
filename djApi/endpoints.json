@@ -1,0 +1,21 @@
+{
+    "api": {
+      "/get_all_data/": {
+        "description": "Get all data from the cache",
+        "TYPE": "GET"
+      },
+      "/search/": {
+        "description": "Perform a filtered full-text search",
+        "TYPE": "GET"
+      },
+      "/autocomplete/": {
+        "description": "Get autocomplete suggestions",
+        "TYPE": "GET"
+      },
+      "/help/": {
+        "description": "API guide",
+        "TYPE": "GET"
+      }
+    }
+  }
+  

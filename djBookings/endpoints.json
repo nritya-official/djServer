@@ -1,0 +1,17 @@
+{
+    "bookings": {
+      "/testEndpoint/": {
+        "description": "Test endpoint for bookings",
+        "TYPE": "GET"
+      },
+      "/freeTrial/": {
+        "description": "Initiate a free trial booking",
+        "TYPE": "POST"
+      },
+      "/availFreeTrial/<str:booking_id>": {
+        "description": "Check availability and details of a free trial booking",
+        "TYPE": "GET"
+      }
+    }
+  }
+  

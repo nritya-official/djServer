@@ -1,4 +1,4 @@
-# myapp/urls.py
+# djServer/djApi/urls.py
 from django.urls import path
 from .views import landing_page, get_all_data, search, autocomplete, help
 
