@@ -4,8 +4,12 @@ source ../backend/bin/activate
 WINDOWS in cmd
 backend\Scripts\activate.bat
 
-python manage.py runserver
+python manage.py runserver [not for us]
+gunicorn djServer.wsgi:application --config gunicorn_config.py
+
 
 heroku login
 heroku ps:scale web=1 -a nrityaserver
 pip freeze > requirements.txt
+
+
