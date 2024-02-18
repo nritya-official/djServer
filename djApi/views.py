@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import JsonResponse
 from django.shortcuts import render
-from .processor import cache, full_text_search
+from .processor import cache, full_text_search, calculate_distance
 from fuzzywuzzy import fuzz
 import json
 import logging
@@ -37,6 +37,8 @@ def search(request):
     query = request.GET.get("query", "")
     city = request.GET.get("city", "")
     dance_style = request.GET.get("danceStyle", "")
+    user_location = (float(request.GET.get("user_lat", 0)), float(request.GET.get("user_lon", 0)))
+
 
     try:
         cache_key = city.lower()
@@ -44,6 +46,16 @@ def search(request):
         logging.info(cache_key)
         logging.info(cached_data)
         results = full_text_search(query, dance_style, cached_data)
+        distance = int(request.GET.get("distance", 0))
+        if distance in [2, 5, 10, 20] and user_location != (0, 0):
+            results = [
+                result for result in results if result.get("geolocation") and
+                calculate_distance(
+                    user_location,
+                    (float(result["geolocation"]["lat"]), float(result["geolocation"]["lng"]))
+                ) <= distance
+            ]
+        logging.info("results length: {}".format(len(results)))
         return JsonResponse(results, safe=False)
     except Exception as e:
         logging.error("Error searching: ", e)

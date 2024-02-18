@@ -5,6 +5,8 @@ import redis
 import logging
 from django.core.cache import cache
 from djApi.flags import FIREBASE_DB
+from geopy.distance import geodesic
+
 logging.basicConfig(level=logging.INFO)
 
 #cache = {}
@@ -39,6 +41,21 @@ def update_cache1(rc):
     except Exception as e:
         print("Error updating cache:", e)
         logging.error("Error updating cache : ",e)
+
+def calculate_distance(location1, location2):
+    """
+    Calculate the street distance between two geolocations.
+
+    Parameters:
+    - location1: Tuple of (latitude, longitude) for the first location
+    - location2: Tuple of (latitude, longitude) for the second location
+
+    Returns:
+    - Distance in kilometers
+    """
+    distance = geodesic(location1, location2).kilometers
+    logging.info("{} {} = {}".format(location1,location2,distance))
+    return distance
 
 def update_cache(rc):
     print("Cache updating....")
