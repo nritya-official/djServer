@@ -48,13 +48,15 @@ def search(request):
         results = full_text_search(query, dance_style, cached_data)
         distance = int(request.GET.get("distance", 0))
         if distance in [2, 5, 10, 20] and user_location != (0, 0):
-            results = [
-                result for result in results if result.get("geolocation") and
-                calculate_distance(
-                    user_location,
-                    (float(result["geolocation"]["lat"]), float(result["geolocation"]["lng"]))
-                ) <= distance
-            ]
+            filtered_results = []
+            for result in results:
+                if result.get("geolocation") :
+                    distance_in_kms =  calculate_distance(user_location,(float(result["geolocation"]["lat"]), float(result["geolocation"]["lng"])))
+                    if(distance_in_kms <= distance):
+                        result["distance_in_kms"] = round(distance_in_kms, 2)
+                        filtered_results.append(result)
+            results = filtered_results
+
         logging.info("results length: {}".format(len(results)))
         return JsonResponse(results, safe=False)
     except Exception as e:
