@@ -87,12 +87,12 @@ def update_cache(rc):
         for city, studios in data_source.items():
             rc.set(city.lower(), json.dumps(studios))
             cached_data = rc.get(city.lower())
-            logging.info(json.loads(cached_data) if cached_data else [])
+            #logging.info(json.loads(cached_data) if cached_data else [])
 
 
         print("Cache updated successfully")
-        logging.info(data_source)
-        #logging.info("Cache updated successfully",data_source)
+        #logging.info(data_source)
+        logging.info("Cache updated successfully")
     except Exception as e:
         print("Error updating cache:", e)
         logging.error("Error updating cache: ", e)
