@@ -94,7 +94,7 @@ def update_cache(rc):
         #logging.info(data_source)
         logging.info("Cache updated successfully")
     except Exception as e:
-        print("Error updating cache:", e)
+        #print("Error updating cache:", e)
         logging.error("Error updating cache: ", e)
 
 
