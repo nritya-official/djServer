@@ -69,7 +69,7 @@ def autocomplete(request):
     city = request.GET.get('city', '').lower()
 
     if not studio_name_query or not city:
-        return jsonify([])
+        return JsonResponse([],safe=False)
 
     # Fetch studio names from Redis based on the provided city
     key = city.lower()+"-Lite"
@@ -84,9 +84,9 @@ def autocomplete(request):
             if ratio >= 70:
                 suggestions.append(name)
 
-        return jsonify(suggestions)
+        return JsonResponse(suggestions,safe=False)
     else:
-        return jsonify([])
+        return JsonResponse([])
 
 
 
