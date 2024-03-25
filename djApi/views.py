@@ -64,13 +64,31 @@ def search(request):
         return JsonResponse({"error": "Internal Server Error"}, status=500)
 
 
+def autocomplete():
+    studio_name_query = request.args.get('query', '').lower()
+    city = request.args.get('city', '').lower()
 
-def autocomplete(request):
-    query = request.GET.get("query", "")
-    results_studio_name = autocomplete_field(cache, query, "studioName")
-    results_dance_styles = autocomplete_field(cache, query, "danceStyles")
-    combined_results = list(set(results_studio_name + results_dance_styles))
-    return JsonResponse(combined_results, safe=False)
+    if not studio_name_query or not city:
+        return jsonify([])
+
+    # Fetch studio names from Redis based on the provided city
+    key = city.lower()+"-Lite"
+    studio_names_json = rc.get(key)
+
+    if studio_names_json:
+        studio_names = json.loads(studio_names_json)
+        # Filter studio names based on the query
+        suggestions = []
+        for name in studio_names:
+            ratio = fuzz.partial_ratio(studio_name_query, name.lower())
+            if ratio >= 70:
+                suggestions.append(name)
+
+        return jsonify(suggestions)
+    else:
+        return jsonify([])
+
+
 
 def help(request):
     endpoint_map = {

@@ -9,39 +9,6 @@ from geopy.distance import geodesic
 
 logging.basicConfig(level=logging.INFO)
 
-#cache = {}
-def update_cache1(rc):
-    print("Cache updating....")
-    logging.info("Cache updating...")
-    x = True
-    try:
-        db = firebase_admin.firestore.client()
-        docs = db.collection('Studio').stream()
-        data_source = {}
-
-        for doc in docs:
-            data = {}
-            for field, value in doc.to_dict().items():
-                logging.info(str(field))
-                if isinstance(value, firebase_admin.firestore.DocumentReference):
-                    data[field] = value.id
-                else:
-                    data[field] = value
-            x = False
-            data["studioId"]=doc.id
-            data_source[doc.id] = data
-            city = data.get("city", "")
-            logging.info(city)
-            #data_source[doc.id].data["studioId"]=doc.id
-
-        data_source_json = json.dumps(data_source)
-        rc.set('studio_data', data_source_json)  
-        print("Cache updated successfully",data_source_json)
-        logging.info("Cache updated successfully")
-    except Exception as e:
-        print("Error updating cache:", e)
-        logging.error("Error updating cache : ",e)
-
 def calculate_distance(location1, location2):
     """
     Calculate the street distance between two geolocations.
@@ -57,7 +24,7 @@ def calculate_distance(location1, location2):
     logging.info("{} {} = {}".format(location1,location2,distance))
     return distance
 
-def update_cache(rc):
+def update_cache_old(rc):
     print("Cache updating....")
     logging.info("Cache updating...")
     x = True
@@ -96,6 +63,48 @@ def update_cache(rc):
     except Exception as e:
         #print("Error updating cache:", e)
         logging.error("Error updating cache: ", e)
+
+def update_cache(rc):
+    logging.info("Cache updating....")
+    db = firestore.client()
+    docs = db.collection('Studio').stream()
+    data_source = {}
+    city_studio_names = {}
+
+    for doc in docs:
+        data = {}
+        for field, value in doc.to_dict().items():
+            allowed_fields = ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId','geolocation']
+            if field in allowed_fields:
+                if isinstance(value, firestore.DocumentReference):
+                    data[field] = value.id
+                else:
+                    data[field] = value
+        data["studioId"] = doc.id
+
+        # Organize data by city in the cache
+        city = data.get("city", "")
+        if city:
+            if city not in data_source:
+                data_source[city] = []
+            data_source[city].append(data)
+
+            studio_name = data.get("studioName", "")
+            if studio_name:
+                if city not in city_studio_names:
+                    city_studio_names[city] = set()
+                city_studio_names[city].add(studio_name)
+
+    
+    for city, studios in data_source.items():
+        rc.set(city.lower(), json.dumps(studios))
+        cached_data = rc.get(city.lower())
+
+    # Save city_studio_names data in Redis
+    for city, studio_names in city_studio_names.items():
+        rc.set(f"{city.lower()}-Lite", json.dumps(list(studio_names)))
+    
+    logging.info("Cache updated successfully")
 
 
 def autocomplete(cache, query):
