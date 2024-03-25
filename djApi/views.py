@@ -64,7 +64,7 @@ def search(request):
         return JsonResponse({"error": "Internal Server Error"}, status=500)
 
 
-def autocomplete():
+def autocomplete(request):
     studio_name_query = request.args.get('query', '').lower()
     city = request.args.get('city', '').lower()
 
