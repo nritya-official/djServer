@@ -65,8 +65,8 @@ def search(request):
 
 
 def autocomplete(request):
-    studio_name_query = request.args.get('query', '').lower()
-    city = request.args.get('city', '').lower()
+    studio_name_query = request.GET.get('query', '').lower()
+    city = request.GET.get('city', '').lower()
 
     if not studio_name_query or not city:
         return jsonify([])
