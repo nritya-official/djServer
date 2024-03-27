@@ -74,7 +74,7 @@ def update_cache(rc):
     for doc in docs:
         data = {}
         for field, value in doc.to_dict().items():
-            allowed_fields = ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId','geolocation']
+            allowed_fields = ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId','geolocation','street']
             if field in allowed_fields:
                 if isinstance(value, firestore.DocumentReference):
                     data[field] = value.id
