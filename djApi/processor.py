@@ -66,7 +66,7 @@ def update_cache_old(rc):
 
 def update_cache(rc):
     logging.info("Cache updating....")
-    db = firestore.client()
+    db = firebase_admin.firestore.client()
     docs = db.collection('Studio').stream()
     data_source = {}
     city_studio_names = {}
@@ -76,7 +76,7 @@ def update_cache(rc):
         for field, value in doc.to_dict().items():
             allowed_fields = ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId','geolocation','street']
             if field in allowed_fields:
-                if isinstance(value, firestore.DocumentReference):
+                if isinstance(value, firebase_admin.firestore.DocumentReference):
                     data[field] = value.id
                 else:
                     data[field] = value
