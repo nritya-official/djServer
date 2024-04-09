@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'django_q',
     'djApi',
     'djBookings',
     'sample',
@@ -162,12 +163,21 @@ LOGGING = {
     },
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
-CELERY_BEAT_SCHEDULE = {
-    'run-every-10-minutes': {
-        'task': 'djServer.tasks.keep_updating_redis',
-        'schedule': timedelta(minutes=2),
-    },
+Q_CLUSTER = {
+    'name': 'djServer',
+    'workers': 8,
+    'recycle': 500,
+    'timeout': 60,
+    'compress': True,
+    'save_limit': 250,
+    'queue_limit': 500,
+    'cpu_affinity': 1,
+    'label': 'Django Q2',
+    'tasks': {
+        'my_periodic_task': {
+            'schedule': timedelta(minutes=10),
+            'func': 'djServer.tasks.keep_updating_redis',
+        },
+    }
 }

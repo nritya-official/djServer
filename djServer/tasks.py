@@ -1,4 +1,3 @@
-from celery import shared_task
 from djApi.processor import update_cache
 import logging
 
@@ -9,8 +8,7 @@ rc = redis.Redis(
     )
 rc.set("foo","bar")
 
-@shared_task
 def keep_updating_redis():
     logging.info("Shared task")
     update_cache(rc)
-    pass
+
