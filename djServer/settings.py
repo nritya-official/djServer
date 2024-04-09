@@ -168,6 +168,6 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_BEAT_SCHEDULE = {
     'run-every-10-minutes': {
         'task': 'djServer.tasks.keep_updating_redis',
-        'schedule': timedelta(minutes=10),
+        'schedule': timedelta(minutes=2),
     },
 }
