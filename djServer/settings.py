@@ -159,3 +159,13 @@ LOGGING = {
         'level': 'INFO',  # Set the desired logging level
     },
 }
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+CELERY_BEAT_SCHEDULE = {
+    'run-every-10-minutes': {
+        'task': 'djServer.tasks.keep_updating_redis',
+        'schedule': timedelta(minutes=10),
+    },
+}

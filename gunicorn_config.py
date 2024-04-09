@@ -27,6 +27,6 @@ def on_starting(server):
 
 def update_cache_periodically():
     logging.info("update cache ")
-    while True:
+    while False:
         update_cache(rc)
         time.sleep(flags.CACHE_UPDATE_INTERVAL)  # Sleep for 10 minutes

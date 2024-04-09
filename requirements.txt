@@ -19,6 +19,8 @@ coreschema==0.0.4
 cryptography==41.0.7
 cssselect2==0.7.0
 Django==5.0
+django-background-tasks==1.2.5
+django-compat==1.0.15
 django-cors-headers==4.3.1
 django-filter==23.5
 django-redis==5.4.0
