@@ -15,15 +15,12 @@ import time
 class Command(BaseCommand):
     help = 'Manages cache updation'
 
-    def add_arguments(self, parser):
-        parser.add_argument('interval', type=int,default=10, help='Interval in minutes for cache update')
-
     def handle(self, *args, **options):
-        interval = options['interval']
+        interval = 5
         logging.info(f'Scheduling cache update every {interval} minutes...')
-        
-        while True:
-
+        x=2
+        while x:
+            x = x-2
             try:
                 rc = redis.Redis(
                     host="redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com", port=11857,
