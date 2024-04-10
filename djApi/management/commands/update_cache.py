@@ -20,7 +20,7 @@ class Command(BaseCommand):
         logging.info(f'Scheduling cache update every {interval} minutes...')
         x=2
         while x:
-            x = x-2
+            x = x-1
             try:
                 rc = redis.Redis(
                     host="redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com", port=11857,
@@ -34,10 +34,11 @@ class Command(BaseCommand):
                 update_cache(rc)
 
                 time.sleep(interval * 60)  
-                
+                if(x==0):
+                    return
             except Exception as e:
                 self.stdout.write(self.style.ERROR(str(e)))
-                time.sleep()  
+                time.sleep(60)  
 
 def update_cache(rc):
     logging.info("Cache updating....")
