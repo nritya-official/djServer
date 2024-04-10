@@ -8,10 +8,11 @@ from sample.views import getsquare
 from djApi.processor import update_cache
 import djApi.flags as flags
 import logging
-logging.basicConfig(level=logging.INFO)  # Set the desired logging level
+logging.basicConfig(level=logging.DEBUG)  # Set the desired logging level
 
 
 def update_cache_periodically():
+    #ignore
     while True:
         update_cache()
         time.sleep(flags.CACHE_UPDATE_INTERVAL)  # Sleep for 10 minutes
@@ -34,6 +35,7 @@ def main():
     logging.info("From main")
     logging.info(sys.argv[1])
     if(sys.argv[1]=='runserver'):
+        #ignore, refactor n remove
         print("Running server so threading for cache")
         logging.info("Threading for cache..")
         flags.init_firebase()

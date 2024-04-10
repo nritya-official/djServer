@@ -1,3 +1,4 @@
+
 from djApi.processor import update_cache
 import logging
 
@@ -9,6 +10,6 @@ rc = redis.Redis(
 rc.set("foo","bar")
 
 def keep_updating_redis():
+    print("Hiiii")
     logging.info("Shared task")
     update_cache(rc)
-

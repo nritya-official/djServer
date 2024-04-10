@@ -1,0 +1,3 @@
+class FLAGS:
+    SLEEP_TIME_SEC=60
+    INTERVAL=10

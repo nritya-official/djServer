@@ -36,7 +36,7 @@ def generate_message(studioOwner=False, studioName="", customerName="", classNam
 
     return subject, body, timestamp_ist
 
-def send_emails(studioName, customerName, className, customerEmail, studioEmail,address="ABC Street",studio_timing="7pm-8pm",studio_days="M,W,F"):
+def send_emails_stc(studioName, customerName, className, customerEmail, studioEmail,address="ABC Street",studio_timing="7pm-8pm",studio_days="M,W,F"):
     qr_code_link= 'https://www.youtube.com/watch?v=by_Z8AofRnE'
     s = smtplib.SMTP('smtp.gmail.com', FLAGS.PORT)
     s.starttls()
@@ -75,7 +75,7 @@ def send_emails(studioName, customerName, className, customerEmail, studioEmail,
 
     s.quit()
 
-send_emails("Hello Default Try 3", "Ayush Raj", "Salsa 4 u", "rayushbpgc@gmail.com", "radarshbpgc@gmail.com",'ABC Street, Gurugram',"6pm-7pm","M,W,F")
+send_emails_stc("Hello Default Try 3", "Ayush Raj", "Salsa 4 u", "rayushbpgc@gmail.com", "radarshbpgc@gmail.com",'ABC Street, Gurugram',"6pm-7pm","M,W,F")
 
 '''
 - free_trial_bookings (collection)
