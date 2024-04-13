@@ -59,7 +59,7 @@ def studioFullPage(request, studioId):
 
     return JsonResponse(studio_data)
 
-def /studioRatingChange(request):
+def studioRatingChange(request):
 
     userId = request.GET.get("userId", "")
     studioId = request.GET.get("studioId", "")
