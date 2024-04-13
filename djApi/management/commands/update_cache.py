@@ -83,7 +83,7 @@ def update_cache(rc):
                 signed_urls.append(signed_url)
         logging.info(signed_urls)
         if(len(signed_urls)>0):
-            data["studioIconUrl"]=signed_urls
+            data["studioIconUrl"]=signed_urls[0]
         else:
             data["studioIconUrl"]=""
         city = data.get("city", "")
