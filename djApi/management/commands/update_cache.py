@@ -33,6 +33,7 @@ class Command(BaseCommand):
         
                 logging.info("Shared task")
                 update_cache(rc)
+                rc.close()
 
                 time.sleep(interval * 60)  
                 if(x==0):
