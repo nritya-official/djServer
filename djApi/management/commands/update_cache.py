@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 import firebase_admin.firestore
+from firebase_admin import credentials, firestore, firestore_async,storage
 import json
 from fuzzywuzzy import fuzz
 import redis
@@ -47,11 +48,11 @@ def update_cache(rc):
         #cred = credentials.Certificate(FIREBASE_CREDENTIALS)
         firebase_admin.initialize_app(FIREBASE_CREDENTIALS)
     
-    if not STORAGE_BUCKET :
+    if not globals().get('STORAGE_BUCKET'):
         app = firebase_admin.initialize_app(FIREBASE_CREDENTIALS, {
             'storageBucket': 'nritya-7e526.appspot.com',
         }, name='storage')
-        STORAGE_BUCKET = storage.bucket(app=app)
+        globals()['STORAGE_BUCKET'] = storage.bucket(app=app)
 
     db = firebase_admin.firestore.client()
     docs = db.collection('Studio').stream()
