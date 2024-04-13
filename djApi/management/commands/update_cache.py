@@ -46,6 +46,12 @@ def update_cache(rc):
         # Initialize Firebase with your credentials
         #cred = credentials.Certificate(FIREBASE_CREDENTIALS)
         firebase_admin.initialize_app(FIREBASE_CREDENTIALS)
+    
+    if not STORAGE_BUCKET :
+        app = firebase_admin.initialize_app(FIREBASE_CREDENTIALS, {
+            'storageBucket': 'nritya-7e526.appspot.com',
+        }, name='storage')
+        STORAGE_BUCKET = storage.bucket(app=app)
 
     db = firebase_admin.firestore.client()
     docs = db.collection('Studio').stream()
@@ -62,12 +68,15 @@ def update_cache(rc):
                 else:
                     data[field] = value
         data["studioId"] = doc.id
-        path="/StudioIcon/{}/".format(doc.id)
+        path = "StudioIcon/{}/".format(doc.id)
         blobs = STORAGE_BUCKET.list_blobs(prefix=path, delimiter="/")
         signed_urls = []
-        for blob in blobs:
-            signed_url = blob.generate_signed_url(datetime.timedelta(seconds=800), method='GET')
-            signed_urls.append(signed_url)
+
+        if blobs:
+            for blob in blobs:
+                signed_url = blob.generate_signed_url(datetime.timedelta(seconds=800), method='GET')
+                signed_urls.append(signed_url)
+
         if(len(signed_urls)>1):
             data["studioIconUrl"]=signed_urls[1]
         else:
