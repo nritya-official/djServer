@@ -82,7 +82,7 @@ def update_cache(rc):
                 signed_url = blob.generate_signed_url(datetime.timedelta(seconds=800), method='GET')
                 signed_urls.append(signed_url)
         logging.info(signed_urls)
-        if(len(signed_urls)>1):
+        if(len(signed_urls)>0):
             data["studioIconUrl"]=signed_urls
         else:
             data["studioIconUrl"]=""
