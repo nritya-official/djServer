@@ -4,13 +4,14 @@ from firebase_admin import credentials, firestore, firestore_async,storage
 import json
 from fuzzywuzzy import fuzz
 import redis
-import logging
 from django.core.cache import cache
 from djApi.flags import FIREBASE_DB,FIREBASE_CREDENTIALS,STORAGE_BUCKET
 from geopy.distance import geodesic
-import logging
 import time
 import datetime
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
     
 
