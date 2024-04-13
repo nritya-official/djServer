@@ -59,7 +59,7 @@ def studioFullPage(request, studioId):
 
     return JsonResponse(studio_data)
 
-def ratingChange(request):
+def /studioRatingChange(request):
 
     userId = request.GET.get("userId", "")
     studioId = request.GET.get("studioId", "")
@@ -95,7 +95,7 @@ def ratingChange(request):
 
     return JsonResponse({"success": True})
 
-def getRating(request,studioId,userId):
+def getStudioRating(request,studioId,userId):
 
     if not studioId or not userId:
         JsonResponse({"success": False})
@@ -182,8 +182,8 @@ def help(request):
         "/autocomplete?query=<your_query>": "Get autocomplete suggestions",
         "/landingPageImages":"Urls of Landing Page img",
         "/studioFullPage/<str:studioId>":"Studio Full Page Data with Images Url",
-        "/getRating/<str:studioId>/<str:userId>/":"Get rating of studio by a user",
-        "ratingChange/":"Change rating of studio by a user",
+        "/getStudioRating/<str:studioId>/<str:userId>/":"Get rating of studio by a user",
+        "/studioRatingChange/":"Change rating of studio by a user",
         "/help": "API guide (you are here)"
     }
     #return JsonResponse(endpoint_map, safe=False)
