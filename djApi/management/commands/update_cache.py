@@ -5,7 +5,7 @@ from fuzzywuzzy import fuzz
 import redis
 import logging
 from django.core.cache import cache
-from djApi.flags import FIREBASE_DB,FIREBASE_CREDENTIALS
+from djApi.flags import FIREBASE_DB,FIREBASE_CREDENTIALS,STORAGE_BUCKET
 from geopy.distance import geodesic
 import logging
 import time
@@ -62,8 +62,16 @@ def update_cache(rc):
                 else:
                     data[field] = value
         data["studioId"] = doc.id
-
-        # Organize data by city in the cache
+        path="/StudioIcon/{}/".format(doc.id)
+        blobs = STORAGE_BUCKET.list_blobs(prefix=path, delimiter="/")
+        signed_urls = []
+        for blob in blobs:
+            signed_url = blob.generate_signed_url(datetime.timedelta(seconds=800), method='GET')
+            signed_urls.append(signed_url)
+        if(len(signed_urls)>1):
+            data["studioIconUrl"]=signed_urls[1]
+        else:
+            data["studioIconUrl"]=""
         city = data.get("city", "")
         if city:
             if city not in data_source:

@@ -48,7 +48,6 @@ def search(request):
     dance_style = request.GET.get("danceStyle", "")
     user_location = (float(request.GET.get("user_lat", 0)), float(request.GET.get("user_lon", 0)))
 
-
     try:
         cache_key = city.lower()
         cached_data = json.loads(rc.get(cache_key) or '[]')
@@ -104,6 +103,7 @@ def help(request):
         "/get_all_data": "Get all data from the cache",
         "/search?query=<your_query>&city=<your_city>&danceStyle=<your_dance_style>": "Perform a filtered full-text search",
         "/autocomplete?query=<your_query>": "Get autocomplete suggestions",
+        "/landingPageImages":"Urls of Landing Page img",
         "/help": "API guide (you are here)"
     }
     #return JsonResponse(endpoint_map, safe=False)
