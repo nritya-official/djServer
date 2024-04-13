@@ -1,6 +1,6 @@
 # djServer/djApi/urls.py
 from django.urls import path
-from .views import landing_page, get_all_data, search, autocomplete, help
+from .views import landing_page, get_all_data, search, autocomplete, help,landingPageImages
 
 urlpatterns = [
     path('', landing_page, name='landing_page'),
@@ -8,4 +8,5 @@ urlpatterns = [
     path('search/', search, name='search'),
     path('autocomplete/', autocomplete, name='autocomplete'),
     path('help/', help, name='help'),
+    path('landingPageImages/', landingPageImages, name='landingPageImages'),
 ]

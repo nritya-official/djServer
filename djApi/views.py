@@ -4,6 +4,8 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.shortcuts import render
 from .processor import cache, full_text_search, calculate_distance
+from djApi.flags import *
+import datetime
 from fuzzywuzzy import fuzz
 import json
 import logging
@@ -32,6 +34,13 @@ def get_all_data(request):
         # Handle case where cache is not populated yet
         return JsonResponse({})
 
+def landingPageImages(request):
+    blobs = STORAGE_BUCKET.list_blobs(prefix="LandingPageImages/D", delimiter="/")
+    signed_urls = []
+    for blob in blobs:
+        signed_url = blob.generate_signed_url(datetime.timedelta(seconds=800), method='GET')
+        signed_urls.append(signed_url)
+    return JsonResponse({"signed_urls": signed_urls,"count":len(signed_urls)})
 
 def search(request):
     query = request.GET.get("query", "")
