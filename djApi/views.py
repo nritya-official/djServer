@@ -34,6 +34,83 @@ def get_all_data(request):
         # Handle case where cache is not populated yet
         return JsonResponse({})
 
+def studioFullPage(request, studioId):
+
+    db = firestore.client()
+    doc_ref = db.collection("Studio").document(studioId)
+
+    doc = doc_ref.get()
+    if doc.exists:
+        studio_data = doc.to_dict()
+    else:
+
+        return JsonResponse({"error": "No such document!"}, status=404)
+
+    path = "StudioImages/{}/".format(studioId)
+    logging.info(path)
+    blobs = STORAGE_BUCKET.list_blobs(prefix=path, delimiter="/")
+    signed_urls = []
+
+    if blobs:
+        for blob in blobs:
+            signed_url = blob.generate_signed_url(datetime.timedelta(seconds=600), method='GET')
+            signed_urls.append(signed_url)
+    studio_data['studioImages'] = signed_urls
+
+    return JsonResponse(studio_data)
+
+def ratingChange(request):
+
+    userId = request.GET.get("userId", "")
+    studioId = request.GET.get("studioId", "")
+    newRating = float(request.GET.get("newRating", ""))
+    db = firestore.client()
+    ratingsId = userId + "_" + studioId
+
+    ratings_ref = db.collection("Ratings").document(ratingsId)
+    studio_ref = db.collection("Studio").document(studioId)
+
+    ratings_doc = ratings_ref.get()
+
+    if ratings_doc.exists:
+        old_rating = ratings_doc.get("rating")
+        total_rating = studio_ref.get("totalRating")
+        rated_by = studio_ref.get("ratedBy")
+        new_total_rating = total_rating - old_rating + newRating
+        avg_rating = new_total_rating / rated_by
+    else:
+        total_rating = studio_ref.get("totalRating")
+        rated_by = studio_ref.get("ratedBy")
+        new_total_rating = total_rating + newRating
+        avg_rating = new_total_rating / (rated_by + 1)
+        rated_by += 1
+
+    ratings_ref.set({"rating": newRating}, merge=True)
+
+    studio_ref.set({
+        "totalRating": new_total_rating,
+        "ratedBy": rated_by,
+        "avgRating": avg_rating
+    }, merge=True)
+
+    return JsonResponse({"success": True})
+
+def getRating(request,studioId,userId):
+
+    if not studioId or not userId:
+        JsonResponse({"success": False})
+
+    ratingsId = userId + "_" + studioId
+    db = firestore.client()
+    ratings_ref = db.collection("Ratings").document(ratingsId)
+    ratings_doc = ratings_ref.get()
+
+    if ratings_doc.exists:
+        rating = ratings_doc.get("rating")
+        return JsonResponse({"success": True,"rating":rating})
+    else:
+        return JsonResponse({"success": False})
+
 def landingPageImages(request):
     blobs = STORAGE_BUCKET.list_blobs(prefix="LandingPageImages/D", delimiter="/")
     signed_urls = []
@@ -104,6 +181,9 @@ def help(request):
         "/search?query=<your_query>&city=<your_city>&danceStyle=<your_dance_style>": "Perform a filtered full-text search",
         "/autocomplete?query=<your_query>": "Get autocomplete suggestions",
         "/landingPageImages":"Urls of Landing Page img",
+        "/studioFullPage/<str:studioId>":"Studio Full Page Data with Images Url",
+        "/getRating/<str:studioId>/<str:userId>/":"Get rating of studio by a user",
+        "ratingChange/":"Change rating of studio by a user",
         "/help": "API guide (you are here)"
     }
     #return JsonResponse(endpoint_map, safe=False)

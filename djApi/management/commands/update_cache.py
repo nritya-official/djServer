@@ -73,7 +73,7 @@ def update_cache(rc):
                     data[field] = value
         data["studioId"] = doc.id
         path = "StudioIcon/{}/".format(doc.id)
-        logging.info(path)
+        #logging.info(path)
         blobs = STORAGE_BUCKET.list_blobs(prefix=path, delimiter="/")
         signed_urls = []
 
@@ -81,7 +81,7 @@ def update_cache(rc):
             for blob in blobs:
                 signed_url = blob.generate_signed_url(datetime.timedelta(seconds=800), method='GET')
                 signed_urls.append(signed_url)
-        logging.info(signed_urls)
+        #logging.info(signed_urls)
         if(len(signed_urls)>0):
             data["studioIconUrl"]=signed_urls[0]
         else:
