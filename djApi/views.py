@@ -59,6 +59,40 @@ def studioFullPage(request, studioId):
 
     return JsonResponse(studio_data)
 
+def get_studio_data(studioId):
+    db = firestore.client()
+    doc_ref = db.collection("Studio").document(studioId)
+
+    doc = doc_ref.get()
+    if doc.exists:
+        return doc.to_dict()
+    else:
+        return None
+
+def get_signed_urls(studioId):
+    path = f"StudioImages/{studioId}/"
+    blobs = STORAGE_BUCKET.list_blobs(prefix=path, delimiter="/")
+    signed_urls = []
+
+    if blobs:
+        for blob in blobs:
+            signed_url = blob.generate_signed_url(datetime.timedelta(seconds=600), method='GET')
+            signed_urls.append(signed_url)
+    return signed_urls
+
+def studioTextData(request, studioId):
+    studio_data = get_studio_data(studioId)
+
+    if studio_data is None:
+        return JsonResponse({"error": "No such document!"}, status=404)
+
+    return JsonResponse(studio_data)
+
+def studioImageURLs(request, studioId):
+    signed_urls = get_signed_urls(studioId)
+    return JsonResponse({"studioImages": signed_urls})
+
+
 def studioRatingChange(request):
 
     userId = request.GET.get("userId", "")

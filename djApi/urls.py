@@ -1,6 +1,6 @@
 # djServer/djApi/urls.py
 from django.urls import path
-from .views import landing_page, get_all_data, search, autocomplete, help, landingPageImages, studioFullPage,studioRatingChange,getStudioRating
+from .views import *
 
 urlpatterns = [
     path('', landing_page, name='landing_page'),
@@ -10,6 +10,8 @@ urlpatterns = [
     path('help/', help, name='help'),
     path('landingPageImages/', landingPageImages, name='landingPageImages'),
     path('studioFullPage/<str:studioId>', studioFullPage, name='studioFullPage'),
+    path('studio/<str:studioId>/text/', studioTextData,name="studioTextData"),
+    path('studio/<str:studioId>/images/', studioImageURLs,name="studioImageURLs"),
     path('studioRatingChange/', studioRatingChange, name='studioRatingChange'),
     path('getStudioRating/<str:studioId>/<str:userId>/', getStudioRating, name='getStudioRating'),
 ]
