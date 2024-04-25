@@ -16,6 +16,7 @@ from django.http import HttpResponse
 from django.template import loader
 import base64
 import os
+from django.shortcuts import render, redirect
 
 def bookingsTest(request):
     logging.info("Hello")
@@ -137,21 +138,38 @@ def freeTrial3(request):
         return JsonResponse("This is the free trial endpoint. Send a POST request to start the free trial.",safe=False)
 
 '''
+
 def availFreeTrial(request,booking_id):
     logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo.png')
+    with open(logo_path, 'rb') as image_file:
+        encoded_string_logo = base64.b64encode(image_file.read()).decode('utf-8')
+
+    return render(request, 'input_form_free_trial.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo})
+
+def availFreeTrialResults(request):
+    booking_id = request.POST.get('booking_id')
+    passcode_value = request.POST.get('input_field')
+    passcode_value = passcode_value.strip()
+    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo.png')
+    with open(logo_path, 'rb') as image_file:
+        encoded_string_logo = base64.b64encode(image_file.read()).decode('utf-8')
+
+    if(not passcode_value.isdigit() or int(passcode_value) != 8311):
+        return render(request,'passcode_wrong.html', {'message': f'Passcode incorrect {passcode_value}','encoded_string_logo':encoded_string_logo })
+
     logging.info(f"Free Trial {booking_id}")
     db = FIREBASE_DB
     doc_ref = db.collection(COLLECTIONS.FREE_TRIAL_BOOKINGS).document(str(booking_id))
-    with open(logo_path, 'rb') as image_file:
-        encoded_string_logo = base64.b64encode(image_file.read()).decode('utf-8')
+   
 
     doc = doc_ref.get()
     if doc.exists:
         booking_data = doc.to_dict()
         logging.info(f"Booking exists data: {doc.to_dict()}")
+        logging.info(booking_data['studio_id'])
         # Check if validated already
         if 'used' in booking_data and booking_data['used']:
-            return render(request, 'case4a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Invalid Booking Id'})
+            return render(request, 'case4a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Valid Booking but Already used'})
             #return JsonResponse({'Booking Id': booking_id, 'Status': 'Valid Booking but Already used'})
 
         # Check if expired (assuming you have a 'expiry_date' field in your data)
@@ -160,10 +178,10 @@ def availFreeTrial(request,booking_id):
             logging.info(expiration_time)
             logging.info(time.time())
             if expiration_time < time.time():
-                return render(request, 'case3a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Invalid Booking Id'})
+                return render(request, 'case3a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Valid booking but Expired'})
                 #return JsonResponse({'Booking Id': booking_id, 'Status': 'Valid booking but Expired'})
             doc_ref.set({"used": True,"used_at":time.time()}, merge=True)
-            return render(request, 'case1a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Invalid Booking Id'})
+            return render(request, 'case1a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Valid Booking Id'})
             #return JsonResponse({'Booking Id': booking_id, 'Status': 'Valid Booking, Enjoy your free class now.'})
 
     else:
@@ -171,6 +189,9 @@ def availFreeTrial(request,booking_id):
         return render(request, 'case2a.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo ,'status': 'Invalid Booking Id'})
         #return render(request, 'case2a.html', {'booking_id': booking_id, 'status': 'Invalid Booking Id'})  /home/ayush/Downloads/FreeTrialCases
         #return JsonResponse({'Booking Id': booking_id,'Status':'Invalid Booking Id'}) #invalid
+
+
+
 
 
 @csrf_exempt

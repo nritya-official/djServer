@@ -5,5 +5,6 @@ urlpatterns = [
     path('testEndpoint/', bookingsTest, name='bookingsTest'),
     path('freeTrial/', freeTrial, name='freeTrial'),
     path('availFreeTrial/<str:booking_id>', availFreeTrial, name='availFreeTrial'),
-    # Add more paths as needed
+    path('availFreeTrialResults/', availFreeTrialResults, name='availFreeTrialResults'),
+    # Add more paths as needed availFreeTrialResults
 ]
