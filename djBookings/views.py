@@ -154,7 +154,9 @@ def availFreeTrialResults(request):
     with open(logo_path, 'rb') as image_file:
         encoded_string_logo = base64.b64encode(image_file.read()).decode('utf-8')
 
-    if(not passcode_value.isdigit() or int(passcode_value) != 8311):
+    if(not passcode_value.isdigit() or int(passcode_value)<999 or int(passcode_value) != 8311):
+        if int(passcode_value) == -1:
+            return render(request,'passcode_wrong.html', {'message': 'Timed out','encoded_string_logo':encoded_string_logo })
         return render(request,'passcode_wrong.html', {'message': f'Passcode incorrect {passcode_value}','encoded_string_logo':encoded_string_logo })
 
     logging.info(f"Free Trial {booking_id}")

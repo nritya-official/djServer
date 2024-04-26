@@ -16,7 +16,6 @@
             box-sizing: border-box; /* Ensure padding is included in the width */
             padding-bottom: 4px;
         }
-
         .wrapper{
         width: 100%;
         height: 100%;
@@ -71,80 +70,46 @@
         text-align: center; 
         }
 
-        .box-circle-success {
-        
-        margin-bottom: 0.5rem; 
-        padding: 1rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        .countdown-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+        .countdown-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 100%;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 25px;
+            font-weight: bold;
+            color: #324e63;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+        .overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 100%;
+            left: 0;
+            background-color: #a2d9ff;
+            transition: top 0.2s linear;
+            opacity: 1;
+        }
+
+        .countdown {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 25%;
+            left: 0;
+            opacity: 1;
         }
 
 
-        .circle-success,
-        .circle-success-border {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        }
-        .circle-success {
-        z-index: 1;
-        position: relative;
-        background: white;
-        transform: scale(1);
-        animation: success-anim 700ms ease;
-        }
-        .circle-success-border {
-        z-index: 0;
-        position: absolute;
-        background: #8f6;
-        transform: scale(1.1);
-        animation: circle-success-anim 400ms ease;
-        }
-
-        @keyframes success-anim {
-        0% {
-            transform: scale(0);
-        }
-        30% {
-            transform: scale(0);
-        }
-        100% {
-            transform: scale(1);
-        }
-        }
-
-        @keyframes circle-success-anim {
-        from {
-            transform: scale(0);
-        }
-        to {
-            transform: scale(1.1);
-        }
-        }
-
-        .success::before,
-        .success::after {
-        content: "";
-        display: block;
-        height: 4px;
-        background: green;
-        position: absolute;
-        }
-
-        .success::before {
-        width: 17px;
-        top: 58%;
-        left: 23%;
-        transform: rotateZ(50deg);
-        }
-
-        .success::after {
-        width: 30px;
-        top: 50%;
-        left: 35%;
-        transform: rotateZ(-50deg);
-        }
 
     </style>
     <title>Free Trial Verification</title>
@@ -158,16 +123,26 @@
                 <img src=" data:image/png;base64,{{ encoded_string_logo }}"><img>
                     <div class="container">
                         <h3 >Studio owner enter Passcode</h3>
+                        <p>Booking Id:{{ booking_id }}</p>
                         <div class="box-text">   
-                            <form action="{% url 'availFreeTrialResults' %}" method="post">
+                            <form id="trialForm" action="{% url 'availFreeTrialResults' %}" method="post">
                                 {% csrf_token %}
                                 <input hidden name="booking_id" value="{{ booking_id }}" readonly>
-                                <input type="number" id="input_field"  name="input_field" min="1000" max="9999" required>
+                                <input type="number" id="input_field"  name="input_field" min="1" max="9999" required>
                                 <br/>
+                               
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </form>
                             <br/>
-                            <p>Booking Id:{{ booking_id }}</p>
+                            <p>Form closing in</p>
+                            <div class="countdown-wrapper">
+                                    <div class="countdown-circle">
+                                        <div class="overlay" id="overlay"></div>
+                                        <span class="countdown"  id="countdown">45</span>  
+                                    </div>      
+                            </div>
+                            <p>second(s)</p>
+                            
                         </div>
 
                     </div>
@@ -175,7 +150,24 @@
         </div>
         
     </div>
+    <script>
+        var timeleft = 45;
+        var countdownTimer = setInterval(function(){
+            if (timeleft <= 0) {
+                clearInterval(countdownTimer);
+                document.getElementById("input_field").value = -1;
+                document.getElementById("trialForm").submit();
+            } else {
+                document.getElementById("countdown").innerHTML =  timeleft ;
+                var percentLeft = (1 - timeleft / 45) * 100;
+                document.getElementById("overlay").style.top = percentLeft + "%";
+            }
+            timeleft -= 1;
+        }, 1000);
+    </script>
+    
 </body>
+
 </html>
 
 
