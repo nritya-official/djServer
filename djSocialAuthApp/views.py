@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from django.conf import settings
+from django.http import JsonResponse
 
 import jwt
 
@@ -25,7 +26,7 @@ def auth_receiver(request):
     Google calls this URL after the user has signed in with their Google account.
     """
     token = request.POST['credential']
-    print("Hii")
+    
     try:
         user_data = id_token.verify_oauth2_token(
             token, requests.Request(), "847422777654-s07i1orl5v5igsoh8vthigptf5ist627.apps.googleusercontent.com"
@@ -38,7 +39,9 @@ def auth_receiver(request):
     # You could also authenticate the user here using the details from Google (https://docs.djangoproject.com/en/4.2/topics/auth/default/#how-to-log-a-user-in)
     request.session['user_data'] = user_data
 
-    return redirect('sign_in')
+    #return redirect('sign_in')
+    return JsonResponse(user_data)
+
 
 
 def sign_out(request):
