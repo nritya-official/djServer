@@ -57,7 +57,6 @@
     {% if request.session.user_data %}
     <div>
         <p>Hi {{ request.session.user_data.given_name }} 🙂</p>
-        <p>{{login_uri}}</p>
         <p>Your email is {{ request.session.user_data.email }}</p>
         <img src="{{ request.session.user_data.picture }}" alt="User picture">
         <p>Click here to <a href="sign-out">Sign out</a></p>
@@ -66,7 +65,6 @@
     <div>
         <p>Hi there 🙂 </p>
         <p>Click below to sign in with Google</p>
-        <p>{{login_uri}}</p>
         <div id="g_id_onload"
             data-client_id="847422777654-s07i1orl5v5igsoh8vthigptf5ist627.apps.googleusercontent.com"
             data-context="signin"
