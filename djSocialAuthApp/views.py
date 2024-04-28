@@ -40,7 +40,7 @@ def auth_receiver(request):
     request.session['user_data'] = user_data
 
     #return redirect('sign_in')
-    return JsonResponse(user_data)
+    return render(request, 'close_browser.html', {'user_data_json': (user_data)})
 
 
 
