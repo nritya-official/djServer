@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ['127.0.0.1','.herokuapp.com','localhost','nrityaserver-2b241e0a
 CORS_ALLOW_ALL_HEADERS = True
 CORS_ALLOW_ALL_METHODS = True
 
-
+SETUP = "LOCAL"
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'djApi',
     'djBookings',
+    'djSocialAuthApp',
     'sample',
     
 ]

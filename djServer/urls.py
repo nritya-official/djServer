@@ -24,4 +24,5 @@ urlpatterns = [
     path('sampleApi/', include('sample.urls')),
     path('api/', include('djApi.urls')),
     path('bookings/', include('djBookings.urls')),
+    path('socialAuthApp/', include('djSocialAuthApp.urls')),
 ]
