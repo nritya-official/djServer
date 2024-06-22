@@ -10,5 +10,5 @@ class PerformanceMonitoringMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         duration = time.time() - request.start_time
-        logging.INFO(f"Processed {request.path} in {duration*1000:.9f} milli seconds")
+        logging.info(f"Processed {request.path} in {duration*1000:.9f} milli seconds")
         return response
