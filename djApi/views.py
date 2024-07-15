@@ -156,14 +156,15 @@ def landingPageImages(request):
 def search(request):
     query = request.GET.get("query", "")
     city = request.GET.get("city", "")
-    dance_style = request.GET.get("danceStyle", "")
+    dance_style = request.GET.get("danceStyle", "").split("|") # Task 1 
+    # Ballet|Salsa => [Ballet, Salsa]
     user_location = (float(request.GET.get("user_lat", 0)), float(request.GET.get("user_lon", 0)))
 
     try:
         cache_key = city.lower()
         cached_data = json.loads(rc.get(cache_key) or '[]')
         
-        results = full_text_search(query, dance_style, cached_data)
+        results = full_text_search(query, dance_style, cached_data) # Task 1
         distance = int(request.GET.get("distance", 0))
         if distance in [2, 5, 10, 20] and user_location != (0, 0):
             filtered_results = []
@@ -222,3 +223,18 @@ def help(request):
     }
     #return JsonResponse(endpoint_map, safe=False)
     return render(request, 'apiGuide.html', {'endpoint_map': endpoint_map})
+
+def studioReviews (request): # Task 2
+    user_id = request.GET.get('userId', '').strip()
+    studio_id = request.GET.get('studioId', '').strip()
+    new_rating = request.GET.get('newRating')
+
+
+    if not user_id or not studio_id or new_rating is None:
+        return JsonResponse({"error": "userId, studioId, and newRating are required and cannot be null or empty"}, status=400)
+    
+    try:
+        new_rating = float(new_rating)
+        return JsonResponse({"message": "Review submitted successfully" , "data" : {"userId" : user_id , "studioId":studio_id , "Rating" : new_rating } }, status=200)
+    except Exception as e:
+        return JsonResponse({"error": e}, status=500)

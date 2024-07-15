@@ -14,4 +14,5 @@ urlpatterns = [
     path('studio/<str:studioId>/images/', studioImageURLs,name="studioImageURLs"),
     path('studioRatingChange/', studioRatingChange, name='studioRatingChange'),
     path('getStudioRating/<str:studioId>/<str:userId>/', getStudioRating, name='getStudioRating'),
+    path('reviews/', studioReviews, name='studioReviews'),
 ]
