@@ -129,8 +129,7 @@ def full_text_search(query, dance_style='', cache=[]):
     logging.info(len(cache))
     results = []
     query_tokens = query.lower().split()  # Tokenize search query
-    dance_style_filters = set(map(str.strip, dance_style.lower().split(',')))
-
+    dance_style_filters = set(map(str.strip, dance_style.lower().split('|')))  # Split danceStyle by '|'
 
     for data in cache:
         # Check if the danceStyle filter is satisfied
@@ -149,7 +148,6 @@ def full_text_search(query, dance_style='', cache=[]):
                 results.append(data)
                 continue
 
-
             # Check if any token in the query partially matches any token in danceStyles or studioName
             if any(
                 fuzz.partial_ratio(query_token, dance_style_token) >= 70 or
@@ -160,37 +158,36 @@ def full_text_search(query, dance_style='', cache=[]):
             ):
                 results.append(data)
 
-    print(len(results))
+    logging.info("Results found: %d", len(results))
     return results
 
 
-def full_text_search1(query, city='', dance_style='',cache={}):
-    print(query)
+
+def full_text_search1(query, city='', dance_style='', cache={}):
+    logging.info("FTS1")
+    logging.info("Query: %s, City: %s, DanceStyle: %s", query, city, dance_style)
     results = []
     query_tokens = query.lower().split()  # Tokenize search query
+    dance_style_filters = set(map(str.strip, dance_style.lower().split('|')))  # Split danceStyle by '|'
 
     for key, data in cache.items():
-        # Check if both the city and danceStyle filters are satisfied
-        # city -> danceStyle-> query
         city_filter = (city is None) or (data.get("city", "").lower() == city.lower())
-        dance_style_filter = (dance_style is None) or (data.get("danceStyles", "").lower() == dance_style.lower())
+        studio_dance_styles = set(map(str.strip, data.get("danceStyles", "").lower().split(',')))
 
         processFurther = True
 
-        if(city!='' or dance_style!=''):
-            if city_filter or dance_style_filter:
-                processFurther =  True
+        if city or dance_style:
+            if city_filter or dance_style_filters.intersection(studio_dance_styles):
+                processFurther = True
             else:
                 processFurther = False
-        print(processFurther,len(query_tokens))
+
         if processFurther:
             dance_styles_tokens = data.get("danceStyles", "").lower().split(',')
             studio_name_tokens = data.get("studioName", "").lower().split()
-            if len(query_tokens) ==0 :
+            if len(query_tokens) == 0:
                 results.append(data)
-                print("Adding...")
                 continue
-            # Check if any token in the query partially matches any token in danceStyles or studioName
             if any(
                 fuzz.partial_ratio(query_token, dance_style_token) >= 70 or
                 fuzz.partial_ratio(query_token, studio_name_token) >= 76
@@ -200,6 +197,5 @@ def full_text_search1(query, city='', dance_style='',cache={}):
             ):
                 results.append(data)
 
-    print(len(results))
+    logging.info("Results found: %d", len(results))
     return results
-
