@@ -10,9 +10,6 @@ from fuzzywuzzy import fuzz
 import json
 import logging
 import redis
-from django.views.decorators.csrf import csrf_exempt
-from .models import Review
-
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 
 rc = redis.Redis(
@@ -225,27 +222,3 @@ def help(request):
     }
     #return JsonResponse(endpoint_map, safe=False)
     return render(request, 'apiGuide.html', {'endpoint_map': endpoint_map})
-
-
-@csrf_exempt
-def create_review(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            user_id = data.get('userId')
-            studio_id = data.get('studioId')
-            new_rating = data.get('newRating')
-
-            if not user_id or not studio_id or not new_rating:
-                return JsonResponse({'error': 'Missing userId, studioId, or newRating'}, status=400)
-
-            # Assume Review is the model for storing reviews
-            review = Review(user_id=user_id, studio_id=studio_id, rating=new_rating)
-            review.save()
-
-            return JsonResponse({'message': 'Review created successfully'}, status=201)
-
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    else:
-        return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)

@@ -1,7 +1,6 @@
 # djServer/djApi/urls.py
 from django.urls import path
 from .views import *
-from . import views
 
 urlpatterns = [
     path('', landing_page, name='landing_page'),
@@ -15,6 +14,4 @@ urlpatterns = [
     path('studio/<str:studioId>/images/', studioImageURLs,name="studioImageURLs"),
     path('studioRatingChange/', studioRatingChange, name='studioRatingChange'),
     path('getStudioRating/<str:studioId>/<str:userId>/', getStudioRating, name='getStudioRating'),
-     path('reviews/', views.create_review, name='create_review'),
-
 ]
