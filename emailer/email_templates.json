@@ -1,0 +1,28 @@
+{
+    "StudioAdd": {
+      "id":1,
+      "subject": "New Studio Added: {{studio_name}}",
+      "body": "Hello,\n\nWe are excited to announce the addition of a new studio: {{studio_name}} (ID: {{studio_id}}) located in {{city}}.\n\nBest regards,\nTeam Nritya"
+    },
+    "StudioUpdate": {
+      "id":2,
+      "subject": "Studio Updated: {{studio_name}}",
+      "body": "Hello,\n\nThe studio: {{studio_name}} (ID: {{studio_id}}) located in {{city}} has been updated.\n\nBest regards,\nTeam Nritya"
+    },
+    "WorkshopAdd": {
+      "id": 50,
+      "subject": "New Workshop Added: {{workshop_name}}",
+      "body": "Hello,\n\nWe are excited to announce the addition of a new workshop: {{workshop_name}} (ID: {{workshop_id}}) hosted in {{city}}.\n\nBest regards,\nTeam Nritya"
+    },
+    "WorkshopUpdate": {
+      "id": 51,
+      "subject": "Workshop Updated: {{workshop_name}}",
+      "body": "Hello,\n\nThe workshop: {{workshop_name}} (ID: {{workshop_id}}) hosted in {{city}} has been updated.\n\nBest regards,\nTeam Nritya"
+    },
+    "FreeTrialBooking": {
+      "id":100,
+      "subject": "Free Trial Booking at {{studio_name}}",
+      "body": "Hello,\n\nYou have successfully booked a free trial class at {{studio_name}} in {{city}}. The class name is {{class_name}}.Avail your free class now !\n\nBest regards,\nTeam Nritya"
+    }
+  }
+  

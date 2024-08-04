@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'djBookings',
     'djSocialAuthApp',
     'sample',
-    
+    'emailer',
 ]
 
 MIDDLEWARE = [

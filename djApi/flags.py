@@ -1,5 +1,5 @@
 import firebase_admin
-from firebase_admin import credentials, firestore, firestore_async,storage
+from firebase_admin import credentials, firestore, firestore_async,storage, auth
 
 
 CACHE_UPDATE_INTERVAL = 600
@@ -7,6 +7,8 @@ FIREBASE_CREDENTIALS = credentials.Certificate('djApi/config.json')
 FIREBASE_APP = None
 FIREBASE_DB = None
 STORAGE_BUCKET =  None
+FIREBASE_AUTH = None
+
 class COLLECTIONS:
     USER = 'User'
     STUDIO = 'Studio'
@@ -30,3 +32,6 @@ def init_firebase():
 
     global STORAGE_BUCKET 
     STORAGE_BUCKET = storage.bucket(app=app)
+
+    global FIREBASE_AUTH
+    FIREBASE_AUTH = auth
