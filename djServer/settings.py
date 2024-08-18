@@ -60,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'djServer.middleware.PerformanceMonitoringMiddleware',
+    'djServer.middleware.FirebaseJWTMiddleware',
 ]
 
 ROOT_URLCONF = 'djServer.urls'
