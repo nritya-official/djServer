@@ -10,6 +10,7 @@ from fuzzywuzzy import fuzz
 import json
 import logging
 import redis
+from rest_framework.decorators import api_view
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 
 rc = redis.Redis(
@@ -18,9 +19,11 @@ rc = redis.Redis(
     password="Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi", # use your Redis password
     )
 
+@api_view(['GET'])
 def landing_page(request):
     return JsonResponse("Hello User! For more check /help", safe=False)
 
+@api_view(['GET'])
 def get_all_data(request):
     # Assuming cache is a global variable
     
@@ -34,6 +37,7 @@ def get_all_data(request):
         # Handle case where cache is not populated yet
         return JsonResponse({})
 
+@api_view(['GET'])
 def studioFullPage(request, studioId):
 
     db = firestore.client()
@@ -59,6 +63,7 @@ def studioFullPage(request, studioId):
 
     return JsonResponse(studio_data)
 
+@api_view(['GET'])
 def get_studio_data(studioId):
     db = firestore.client()
     doc_ref = db.collection("Studio").document(studioId)
@@ -93,6 +98,7 @@ def studioImageURLs(request, studioId):
     return JsonResponse({"studioImages": signed_urls})
 
 
+@api_view(['GET'])
 def studioRatingChange(request):
 
     userId = request.GET.get("userId", "")
@@ -129,6 +135,7 @@ def studioRatingChange(request):
 
     return JsonResponse({"success": True})
 
+@api_view(['GET'])
 def getStudioRating(request,studioId,userId):
 
     if not studioId or not userId:
@@ -145,6 +152,7 @@ def getStudioRating(request,studioId,userId):
     else:
         return JsonResponse({"success": False})
 
+@api_view(['GET'])
 def landingPageImages(request):
     blobs = STORAGE_BUCKET.list_blobs(prefix="LandingPageImages/D", delimiter="/")
     signed_urls = []
@@ -153,6 +161,7 @@ def landingPageImages(request):
         signed_urls.append(signed_url)
     return JsonResponse({"signed_urls": signed_urls,"count":len(signed_urls)})
 
+@api_view(['GET'])
 def search(request):
     query = request.GET.get("query", "")
     city = request.GET.get("city", "")
@@ -181,7 +190,7 @@ def search(request):
         logging.error("Error searching: ", e)
         return JsonResponse({"error": "Internal Server Error"}, status=500)
 
-
+@api_view(['GET'])
 def autocomplete(request):
     studio_name_query = request.GET.get('query', '').lower()
     city = request.GET.get('city', '').lower()

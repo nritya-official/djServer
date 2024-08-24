@@ -5,6 +5,11 @@ from django.views.decorators.csrf import csrf_exempt
 from djApi.flags import FIREBASE_AUTH
 import logging
 import jwt
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 def authVerifier():
     try:
@@ -22,89 +27,112 @@ def authVerifier():
         else:
             logging.error("Error processing token %s", (e))
 
-@csrf_exempt
-def studioAdd(request):
-    try:
-        variables = {
-            "studio_name": request.POST.get("studio_name"),
-            "studio_id": request.POST.get("studio_id"),
-            "city": request.POST.get("city")
-        }
-        templates = load_templates()
-        subject, body = render_template("StudioAdd", variables, templates)
-        send_email_passkey(request.POST.get("receiver_emails"), subject, body)
-        return JsonResponse({"status": "success", "message": "Email sent successfully."})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)})
+@method_decorator(csrf_exempt, name='dispatch')
+class StudioAdd(APIView):
+    authentication_classes = []  # Disable authentication
+    permission_classes = []      # Disable permissions
 
-@csrf_exempt
-def studioUpdate(request):
-    try:
-        variables = {
-            "studio_name": request.POST.get("studio_name"),
-            "studio_id": request.POST.get("studio_id"),
-            "city": request.POST.get("city")
-        }
-        templates = load_templates()
-        subject, body = render_template("StudioUpdate", variables, templates)
-        send_email_passkey(request.POST.get("receiver_emails"), subject, body)
-        return JsonResponse({"status": "success", "message": "Email sent successfully."})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)})
+    def post(self, request):
+        try:
+            variables = {
+                "studio_name": request.data.get("studio_name"),
+                "studio_id": request.data.get("studio_id"),
+                "city": request.data.get("city")
+            }
+            templates = load_templates()
+            subject, body = render_template("StudioAdd", variables, templates)
+            send_email_passkey(request.data.get("receiver_emails"), subject, body)
+            return Response({"status": "success", "message": "Email sent successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@method_decorator(csrf_exempt, name='dispatch')
+class StudioUpdate(APIView):
+    authentication_classes = []  # Disable authentication
+    permission_classes = []      # Disable permissions
 
-@csrf_exempt
-def workshopAdd(request):
-    try:
-        variables = {
-            "workshop_name": request.POST.get("workshop_name"),
-            "workshop_id": request.POST.get("workshop_id"),
-            "city": request.POST.get("city")
-        }
-        templates = load_templates()
-        subject, body = render_template("WorkshopAdd", variables, templates)
-        send_email_passkey(request.POST.get("receiver_emails"), subject, body)
-        return JsonResponse({"status": "success", "message": "Email sent successfully."})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)})
+    def post(self, request):
+        try:
+            variables = {
+                "studio_name": request.data.get("studio_name"),
+                "studio_id": request.data.get("studio_id"),
+                "city": request.data.get("city")
+            }
+            templates = load_templates()
+            subject, body = render_template("StudioUpdate", variables, templates)
+            send_email_passkey(request.data.get("receiver_emails"), subject, body)
+            return Response({"status": "success", "message": "Email sent successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@csrf_exempt
-def workshopUpdate(request):
-    try:
-        variables = {
-            "workshop_name": request.POST.get("workshop_name"),
-            "workshop_id": request.POST.get("workshop_id"),
-            "city": request.POST.get("city")
-        }
-        templates = load_templates()
-        subject, body = render_template("WorkshopUpdate", variables, templates)
-        send_email_passkey(request.POST.get("receiver_emails"), subject, body)
-        return JsonResponse({"status": "success", "message": "Email sent successfully."})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)})
+@method_decorator(csrf_exempt, name='dispatch')
+class WorkshopAdd(APIView):
+    authentication_classes = []  # Disable authentication
+    permission_classes = []      # Disable permissions
 
-@csrf_exempt
-def freeTrialBookings(request):
-    try:
-        variables = {
-            "studio_name": request.POST.get("studio_name"),
-            "class_name": request.POST.get("class_name"),
-            "city": request.POST.get("city")
-        }
-        templates = load_templates()
-        subject, body = render_template("FreeTrialBooking", variables, templates)
-        send_email_passkey(request.POST.get("receiver_emails"), subject, body)
-        return JsonResponse({"status": "success", "message": "Email sent successfully."})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)})
+    def post(self, request):
+        try:
+            variables = {
+                "workshop_name": request.data.get("workshop_name"),
+                "workshop_id": request.data.get("workshop_id"),
+                "city": request.data.get("city")
+            }
+            templates = load_templates()
+            subject, body = render_template("WorkshopAdd", variables, templates)
+            send_email_passkey(request.data.get("receiver_emails"), subject, body)
+            return Response({"status": "success", "message": "Email sent successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@csrf_exempt
-def sendEmail(request):
-    try:
-        subject = request.POST.get("subject")
-        body = request.POST.get("body")
-        receiver_emails = request.POST.get("receiver_emails")
-        send_email_passkey(receiver_emails, subject, body)
-        return JsonResponse({"status": "success", "message": "Email sent successfully."})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)})
+@method_decorator(csrf_exempt, name='dispatch')
+class WorkshopUpdate(APIView):
+    authentication_classes = []  # Disable authentication
+    permission_classes = []      # Disable permissions
+
+    def post(self, request):
+        try:
+            variables = {
+                "workshop_name": request.data.get("workshop_name"),
+                "workshop_id": request.data.get("workshop_id"),
+                "city": request.data.get("city")
+            }
+            templates = load_templates()
+            subject, body = render_template("WorkshopUpdate", variables, templates)
+            send_email_passkey(request.data.get("receiver_emails"), subject, body)
+            return Response({"status": "success", "message": "Email sent successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class FreeTrialBookings(APIView):
+    authentication_classes = []  # Disable authentication
+    permission_classes = []      # Disable permissions
+
+    def post(self, request):
+        try:
+            variables = {
+                "studio_name": request.data.get("studio_name"),
+                "class_name": request.data.get("class_name"),
+                "city": request.data.get("city")
+            }
+            templates = load_templates()
+            subject, body = render_template("FreeTrialBooking", variables, templates)
+            send_email_passkey(request.data.get("receiver_emails"), subject, body)
+            return Response({"status": "success", "message": "Email sent successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SendEmail(APIView):
+    authentication_classes = []  # Disable authentication
+    permission_classes = []      # Disable permissions
+
+    def post(self, request):
+        try:
+            subject = request.data.get("subject")
+            body = request.data.get("body")
+            receiver_emails = request.data.get("receiver_emails")
+            send_email_passkey(receiver_emails, subject, body)
+            return Response({"status": "success", "message": "Email sent successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

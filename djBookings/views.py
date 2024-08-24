@@ -17,6 +17,7 @@ from django.template import loader
 import base64
 import os
 from django.shortcuts import render, redirect
+from rest_framework.decorators import api_view
 
 def bookingsTest(request):
     logging.info("Hello")
@@ -49,96 +50,8 @@ def _get_studio_info(studio_id, classIndex):
         logging.info(f"Studio Document data: {name_studio} {email_studio} {name_class}")
     else:
         logging.info("No such document of studio!")
-'''
-@csrf_exempt
-def freeTrial2(request):
-    logging.info("Free Trial")
-    name_studio = name_class = name_learner = studio_address = booked = email_studio = email_learner = ""
 
-    if request.method == 'POST':
-        logging.info("Free trial request received.")
-        logging.info(request.body)
-
-        try:
-            request_data = json.loads(request.body.decode('utf-8'))
-            user_id = request_data.get('userId')
-            studio_id = request_data.get('studioId')
-            classIndex = request_data.get('classIndex')
-
-            if user_id and studio_id and classIndex:
-                # if Trial/studio_id/user_id/classIndex trialDone:
-                #   return JsonResponse({'type':'TrialDone',message:'You have already availed trial for this'})
-                user_thread = threading.Thread(target=_get_user_info, args=(user_id,))
-                studio_thread = threading.Thread(target=_get_studio_info, args=(studio_id, classIndex))
-                user_thread.start()
-                studio_thread.start()
-                user_thread.join()
-                studio_thread.join()
-
-        except json.JSONDecodeError as e:
-            logging.error(f"Error decoding JSON: {e}")
-
-        return JsonResponse({'message': 'This is the free trial bookings endpoint.'})
-    else:
-        logging.info(request.method)
-        return JsonResponse("This is the free trial endpoint. Send a POST request to start the free trial.", safe=False)
-
-
-@csrf_exempt
-def freeTrial3(request):
-    logging.info("Free Trial")
-    db = FIREBASE_DB
-    name_studio = name_class = name_learner = studio_address = booked = email_studio = email_learner = ""
-    if request.method == 'POST':
-        # Handle the POST request for the free trial
-        logging.info("Free trial request received.")
-        logging.info(request.body)
-        try:
-            request_data = json.loads(request.body.decode('utf-8'))
-            user_id, studio_id = "",""
-            user_id = request_data.get('userId')
-            studio_id = request_data.get('studioId')
-            classIndex = request_data.get('classIndex')
-            logging.info(user_id+" "+studio_id)
-            if user_id != "" and studio_id != "":
-                #logging.info("Both IDs are there")
-                user_ref = db.collection(COLLECTIONS.USER).document(user_id)
-                #logging.info("Got User_ref")
-                studio_ref = db.collection(COLLECTIONS.STUDIO).document(studio_id)
-                #logging.info("Got studio_ref")
-                user_doc = user_ref.get()
-                #logging.info("Got user_doc")
-                #logging.info(user_id+" "+studio_id)
-                if user_doc.exists:
-                    user_map = user_doc.to_dict()
-                    name_learner = user_map['Name']
-                    email_learner = user_map['Email']
-                    
-                else:
-                    logging.info("No such document of User!")
-                
-                studio_doc = studio_ref.get()
-                if studio_doc.exists:
-                    studio_map = studio_doc.to_dict()
-                    name_studio = studio_map['studioName']
-                    email_studio = studio_map['mailAddress']
-                    name_class = studio_map['tableData'][str(classIndex)]['className']
-                    send_emails(name_studio,name_learner,name_class,email_learner,email_studio)
-                else:
-                    logging.info("No such document of studio!")
-                
-                logging.info(
-                    f"{user_id} {email_learner} {name_learner} {name_studio} {email_studio} {str(name_class)}"
-                )
-        except json.JSONDecodeError as e:
-            logging.error(f"Error decoding JSON: {e}")
-        return JsonResponse({'message': 'This is the free trial bookings endpoint.'})
-    else:
-        logging.info(request.method)
-        return JsonResponse("This is the free trial endpoint. Send a POST request to start the free trial.",safe=False)
-
-'''
-
+@api_view(['GET'])
 def availFreeTrial(request,booking_id):
     logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo.png')
     with open(logo_path, 'rb') as image_file:
@@ -146,6 +59,7 @@ def availFreeTrial(request,booking_id):
 
     return render(request, 'input_form_free_trial.html', {'booking_id': booking_id,'encoded_string_logo':encoded_string_logo})
 
+@api_view(['POST'])
 def availFreeTrialResults(request):
     booking_id = request.POST.get('booking_id')
     passcode_value = request.POST.get('input_field')
@@ -195,7 +109,7 @@ def availFreeTrialResults(request):
 
 
 
-
+@api_view(['POST'])
 @csrf_exempt
 def freeTrial(request):
     logging.info("Free Trial")

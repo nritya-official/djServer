@@ -28,6 +28,7 @@ class FirebaseJWTMiddleware(MiddlewareMixin):
     def __call__(self, request):
         if request.path in self.allowed_paths:
             auth_header = request.headers.get('Authorization')
+            id_token = None
             if auth_header and auth_header.startswith('Bearer '):
                 id_token = auth_header.split('Bearer ')[1]
             if not id_token:
