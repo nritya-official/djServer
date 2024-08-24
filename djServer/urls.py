@@ -21,9 +21,8 @@ from .views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('docs/',docs, name='docs'),
-    path('sampleApi/', include('sample.urls')),
+    path('',docs, name='docs'),
     path('api/', include('djApi.urls')),
     path('bookings/', include('djBookings.urls')),
-    path('socialAuthApp/', include('djSocialAuthApp.urls')),
     path('emailer/', include('emailer.urls')),
 ]

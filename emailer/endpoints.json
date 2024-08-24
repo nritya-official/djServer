@@ -1,0 +1,29 @@
+{
+    "emailer": {
+      "/studioAdd/": {
+        "description": "Send email on studio Add",
+        "TYPE": "POST"
+      },
+      "/studioUpdates/": {
+        "description": "Send email on studio Update",
+        "TYPE": "POST"
+      },
+      "/workshopAdd/": {
+        "description": "Send email on workshop Add",
+        "TYPE": "POST"
+      },
+      "/workshopUpdate/": {
+        "description": "Send email on workshop Update",
+        "TYPE": "POST"
+      },
+      "/freeTrialBookings/": {
+        "description": "Send email on free Trial Bookings",
+        "TYPE": "POST"
+      },
+      "/sendEmail/": {
+        "description": "Send email template",
+        "TYPE": "POST"
+      }
+    }
+  }
+  

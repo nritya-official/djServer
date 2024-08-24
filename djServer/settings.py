@@ -45,9 +45,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'djApi',
     'djBookings',
-    'djSocialAuthApp',
-    'sample',
     'emailer',
+    'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [

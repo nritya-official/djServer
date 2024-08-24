@@ -164,8 +164,8 @@ def search(request):
         cached_data = json.loads(rc.get(cache_key) or '[]')
         
         results = full_text_search(query, dance_style, cached_data)
-        distance = int(request.GET.get("distance", 0))
-        if distance in [2, 5, 10, 20] and user_location != (0, 0):
+        distance = int(request.GET.get("distance", 20))
+        if user_location != (0, 0):
             filtered_results = []
             for result in results:
                 if result.get("geolocation") :

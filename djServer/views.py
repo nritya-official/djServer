@@ -20,13 +20,15 @@ def docs(request):
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     djApi_endpoint_path = os.path.join(base_dir, 'djApi', 'endpoints.json')
     djBookings_endpoint_path = os.path.join(base_dir, 'djBookings', 'endpoints.json')
-    logging.info("{} {}".format(djApi_endpoint_path,djBookings_endpoint_path))
+    djEmailer_endpoint_path = os.path.join(base_dir, 'emailer', 'endpoints.json')
+    logging.info("{} {} {}".format(djApi_endpoint_path,djBookings_endpoint_path,djEmailer_endpoint_path))
     # Load endpoint maps from JSON files
-    with open(djApi_endpoint_path) as f_djApi, open(djBookings_endpoint_path) as f_djBookings:
+    with open(djApi_endpoint_path) as f_djApi, open(djBookings_endpoint_path) as f_djBookings, open(djEmailer_endpoint_path) as f_djEmailer:
         endpoint_map_djApi = json.load(f_djApi)
         endpoint_map_djBookings = json.load(f_djBookings)
+        endpoint_map_djEmailer = json.load(f_djEmailer)
 
     # Merge endpoint maps
-    endpoint_map = {**endpoint_map_djApi, **endpoint_map_djBookings}
+    endpoint_map = {**endpoint_map_djApi, **endpoint_map_djBookings, **endpoint_map_djEmailer}
 
     return render(request, 'apiGuides.html', {'endpoint_map': endpoint_map})
