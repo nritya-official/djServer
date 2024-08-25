@@ -165,16 +165,18 @@ def landingPageImages(request):
 @api_view(['GET'])
 def search(request):
     query = request.GET.get("query", "")
-    city = request.GET.get("city", "")
+    city = request.GET.get("city", "New Delhi")
     dance_style = request.GET.get("danceStyle", "")
     entity = request.GET.get("entity", "Studio")
     user_location = (float(request.GET.get("user_lat", 0)), float(request.GET.get("user_lon", 0)))
-
+    logging.info(entity)
     try:
         cache_key = city.lower()
         cache_key = cache_key + "-" + entity
         logging.info(entity)
         cached_data = json.loads(rc.get(cache_key) or '[]')
+        if entity != 'Studio':
+            return JsonResponse(cached_data, safe=False)
         
         results = full_text_search(query, dance_style, cached_data)
         distance = int(request.GET.get("distance", 20))
