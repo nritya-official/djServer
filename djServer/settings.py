@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'djBookings',
     'emailer',
     'rest_framework_swagger',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

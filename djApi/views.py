@@ -63,7 +63,6 @@ def studioFullPage(request, studioId):
 
     return JsonResponse(studio_data)
 
-@api_view(['GET'])
 def get_studio_data(studioId):
     db = firestore.client()
     doc_ref = db.collection("Studio").document(studioId)
@@ -85,6 +84,7 @@ def get_signed_urls(studioId):
             signed_urls.append(signed_url)
     return signed_urls
 
+@api_view(['GET'])
 def studioTextData(request, studioId):
     studio_data = get_studio_data(studioId)
 
@@ -93,6 +93,7 @@ def studioTextData(request, studioId):
 
     return JsonResponse(studio_data)
 
+@api_view(['GET'])
 def studioImageURLs(request, studioId):
     signed_urls = get_signed_urls(studioId)
     return JsonResponse({"studioImages": signed_urls})
@@ -166,10 +167,13 @@ def search(request):
     query = request.GET.get("query", "")
     city = request.GET.get("city", "")
     dance_style = request.GET.get("danceStyle", "")
+    entity = request.GET.get("entity", "Studio")
     user_location = (float(request.GET.get("user_lat", 0)), float(request.GET.get("user_lon", 0)))
 
     try:
         cache_key = city.lower()
+        cache_key = cache_key + "-" + entity
+        logging.info(entity)
         cached_data = json.loads(rc.get(cache_key) or '[]')
         
         results = full_text_search(query, dance_style, cached_data)
@@ -194,12 +198,13 @@ def search(request):
 def autocomplete(request):
     studio_name_query = request.GET.get('query', '').lower()
     city = request.GET.get('city', '').lower()
+    entity = request.GET.get("entity", "Studio")
 
     if not studio_name_query or not city:
         return JsonResponse([],safe=False)
 
     # Fetch studio names from Redis based on the provided city
-    key = city.lower()+"-Lite"
+    key = city.lower()+"-"+entity+"Lite"
     studio_names_json = rc.get(key)
 
     if studio_names_json:

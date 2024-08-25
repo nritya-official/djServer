@@ -63,7 +63,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(str(e)))
                 time.sleep(60)  
 
-def update_cache(rc):
+def update_cache1(rc):
     logging.info("Cache updating from management....")
     logging.info(rc.keys('*'))
     if not firebase_admin._apps:
@@ -133,7 +133,7 @@ def update_cache(rc):
     logging.info("Cache updated successfully")
 
 
-def update_cache1(rc):
+def update_cache(rc):
     logging.info("Cache updating from management....")
     logging.info(rc.keys('*'))
     if not firebase_admin._apps:
