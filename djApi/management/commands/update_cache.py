@@ -154,7 +154,7 @@ def update_cache(rc):
         process_collection(collection, collection_fields[collection], rc,db)
 
 def process_collection(collection_name, allowed_fields, rc, db):
-    logging.info(f"Processing collection: {collection_name}....")
+    logging.info(f"Processing collection: {collection_name} with allowed fields {allowed_fields}....")
     
     docs = db.collection(collection_name).stream()
     data_source = {}
@@ -205,4 +205,4 @@ def process_collection(collection_name, allowed_fields, rc, db):
     last_updated_time = time.time()
     rc.set(f"last_updated_{collection_name.lower()}", last_updated_time)
     
-    logging.info(f"Cache for collection {collection_name} updated successfully")
+    logging.info(f"Cache for collection {collection_name} updated successfully.")

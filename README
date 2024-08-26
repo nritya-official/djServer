@@ -21,4 +21,4 @@ curl -X POST -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImNlMzcxNzMwZ
      -d 'studio_name=Test Studio&studio_id=123&city=Test City&receiver_emails=rayushbpgc@gmail.com&user_id=th7Hv55ysNWZGiXUx7w3pxceNX32' \
      "http://localhost:8000/emailer/studioAdd/"
 
-https://nrityaserver-2b241e0a97e5.herokuapp.com/api/search/?&city=Surat&entity=Worskshop
+https://nrityaserver-2b241e0a97e5.herokuapp.com/api/search/?&city=Surat&entity=Workshops
