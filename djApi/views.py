@@ -175,10 +175,10 @@ def search(request):
         cache_key = cache_key + "-" + entity
         logging.info(entity)
         cached_data = json.loads(rc.get(cache_key) or '[]')
-        if entity != 'Studio':
-            return JsonResponse(cached_data, safe=False)
+        #if entity != 'Studio':
+            #return JsonResponse(cached_data, safe=False)
         
-        results = full_text_search(query, dance_style, cached_data)
+        results = full_text_search(query, dance_style, cached_data,entity=entity)
         distance = int(request.GET.get("distance", 20))
         if user_location != (0, 0):
             filtered_results = []

@@ -124,82 +124,73 @@ def filter_by_dance_style(data, dance_style):
     return dance_style is None or data.get("danceStyles", "").lower() == dance_style.lower()
 
 
-def full_text_search(query, dance_style='', cache=[]):
+collection_name_field ={
+    'Studio' : 'studioName',
+    'Workshops' : 'workshopName',
+    'OpenClasses' : 'openClassName',
+    'Courses' : 'workshopName'
+}
+
+
+collection_danceStyles_field ={
+    'Studio' : 'danceStyles',
+    'Workshops' : 'danceStyles',
+    'OpenClasses' : 'danceStyle',
+    'Courses' : 'danceStyles'
+}
+
+def fuzzy_match(token1, token2, threshold):
+    return fuzz.partial_ratio(token1, token2) >= threshold
+
+def match_tokens(query_tokens, name_tokens, style_tokens):
+    for query_token in query_tokens:
+        for name_token in name_tokens:
+            if fuzzy_match(query_token, name_token, 75):
+                return True
+        for style_token in style_tokens:
+            if fuzzy_match(query_token, style_token, 60):
+                return True
+    return False
+
+def full_text_search(query, dance_style='', cache=[], entity="Studio"):
     logging.info("FTS")
-    logging.info(len(cache))
+    logging.debug(len(cache))
     results = []
-    query_tokens = query.lower().split()  # Tokenize search query
+    dance_style_field_name = collection_danceStyles_field.get(entity, 'danceStyles')
+    entity_name_field = collection_name_field.get(entity, 'studioName')
+
+    # Preprocessing & Tokenisation of query and dance_style filters
+    query_tokens = query.lower().split()
     dance_style_filters = set(map(str.strip, dance_style.lower().split(',')))
 
-
     for data in cache:
-        # Check if the danceStyle filter is satisfied
-        studio_dance_styles = set(map(str.strip, data.get("danceStyles", "").lower().split(',')))
-        dance_styles_tokens = data.get("danceStyles", "").lower().split(',')
+        # Retrieve dance styles and entity name from cache
+        dance_styles_data = data.get(dance_style_field_name, "")
+        entity_name_data = data.get(entity_name_field, "").lower()
 
-        if len(query)==0 and len(dance_style)==0:
+        # Tokenize dance styles data from cache to a set of tokens
+        if isinstance(dance_styles_data, str):
+            entity_dance_styles = set(map(str.strip, dance_styles_data.lower().split(',')))
+            dance_styles_tokens = dance_styles_data.lower().split(',')
+        elif isinstance(dance_styles_data, list):
+            entity_dance_styles = set(map(lambda x: x.strip().lower(), dance_styles_data))
+            dance_styles_tokens = [style.lower() for style in dance_styles_data]
+        else:
+            entity_dance_styles = set()
+            dance_styles_tokens = []
+
+        if len(query_tokens) == 0 and not len(dance_style_filters)==0:
             results.append(data)
             continue
 
         if dance_style_filters:
-            studio_name_tokens = data.get("studioName", "").lower().split()
-            dance_style_filter_matched = not dance_style_filters or dance_style_filters.intersection(studio_dance_styles)
-
-            if dance_style_filter_matched:
+            if dance_style_filters.intersection(entity_dance_styles):
                 results.append(data)
                 continue
 
+        entity_name_tokens = entity_name_data.split()
+        if match_tokens(query_tokens, entity_name_tokens, dance_styles_tokens):
+            results.append(data)
 
-            # Check if any token in the query partially matches any token in danceStyles or studioName
-            if any(
-                fuzz.partial_ratio(query_token, dance_style_token) >= 70 or
-                fuzz.partial_ratio(query_token, studio_name_token) >= 76
-                for query_token in query_tokens
-                for dance_style_token in dance_styles_tokens
-                for studio_name_token in studio_name_tokens
-            ):
-                results.append(data)
-
-    print(len(results))
+    logging.info(f"Total results found: {len(results)}")
     return results
-
-
-def full_text_search1(query, city='', dance_style='',cache={}):
-    print(query)
-    results = []
-    query_tokens = query.lower().split()  # Tokenize search query
-
-    for key, data in cache.items():
-        # Check if both the city and danceStyle filters are satisfied
-        # city -> danceStyle-> query
-        city_filter = (city is None) or (data.get("city", "").lower() == city.lower())
-        dance_style_filter = (dance_style is None) or (data.get("danceStyles", "").lower() == dance_style.lower())
-
-        processFurther = True
-
-        if(city!='' or dance_style!=''):
-            if city_filter or dance_style_filter:
-                processFurther =  True
-            else:
-                processFurther = False
-        print(processFurther,len(query_tokens))
-        if processFurther:
-            dance_styles_tokens = data.get("danceStyles", "").lower().split(',')
-            studio_name_tokens = data.get("studioName", "").lower().split()
-            if len(query_tokens) ==0 :
-                results.append(data)
-                print("Adding...")
-                continue
-            # Check if any token in the query partially matches any token in danceStyles or studioName
-            if any(
-                fuzz.partial_ratio(query_token, dance_style_token) >= 70 or
-                fuzz.partial_ratio(query_token, studio_name_token) >= 76
-                for query_token in query_tokens
-                for dance_style_token in dance_styles_tokens
-                for studio_name_token in studio_name_tokens
-            ):
-                results.append(data)
-
-    print(len(results))
-    return results
-
