@@ -198,27 +198,14 @@ def search(request):
 
 @api_view(['GET'])
 def autocomplete(request):
-    studio_name_query = request.GET.get('query', '').lower()
+    #studio_name_query = request.GET.get('query', '').lower()
     city = request.GET.get('city', '').lower()
     entity = request.GET.get("entity", "Studio")
-
-    if not studio_name_query or not city:
-        return JsonResponse([],safe=False)
-
-    # Fetch studio names from Redis based on the provided city
-    key = city.lower()+"-"+entity+"Lite"
+    key = city.lower()+"-"+entity+'-'+"Lite"
     studio_names_json = rc.get(key)
-
+    logging.info(studio_names_json)
     if studio_names_json:
-        studio_names = json.loads(studio_names_json)
-        # Filter studio names based on the query
-        suggestions = []
-        for name in studio_names:
-            ratio = fuzz.partial_ratio(studio_name_query, name.lower())
-            if ratio >= 70:
-                suggestions.append(name)
-
-        return JsonResponse(suggestions,safe=False)
+        return JsonResponse(json.loads(studio_names_json),safe=False)
     else:
         return JsonResponse([])
 

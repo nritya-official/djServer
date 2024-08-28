@@ -122,15 +122,17 @@ def process_collection(collection_name, allowed_fields, rc, db):
             item_name = data.get(collection_name_field[collection_name], "")
             if item_name:
                 if city not in city_item_names:
-                    city_item_names[city] = set()
-                city_item_names[city].add(item_name)
+                    city_item_names[city] = {None:None}
+                city_item_names[city][data["id"]] = item_name 
 
     for city, items in data_source.items():
         rc.set(f"{city.lower()}-{collection_name}", json.dumps(items))
     logging.info(collection_name.lower())
     logging.info(city_item_names)
     for city, item_names in city_item_names.items():
-        rc.set(f"{city.lower()}-{collection_name}-Lite", json.dumps(list(item_names)))
+        logging.info(f"{city.lower()}-{collection_name}-Lite")
+        logging.info(item_names)
+        rc.set(f"{city.lower()}-{collection_name}-Lite", json.dumps((item_names)))
     
     last_updated_time = time.time()
     rc.set(f"last_updated_{collection_name.lower()}", last_updated_time)
