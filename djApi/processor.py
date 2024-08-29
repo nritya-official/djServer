@@ -182,7 +182,7 @@ def full_text_search(query, dance_style='', cache={}, entity="Studio"):
             entity_dance_styles = set()
             dance_styles_tokens = []
 
-        if len(query_tokens) == 0 and not len(dance_style_filters) == 0:
+        if len(query_tokens) == 0 and len(dance_style_filters) == 0:
             results[data_id] = data
             continue
 
@@ -190,54 +190,13 @@ def full_text_search(query, dance_style='', cache={}, entity="Studio"):
             if dance_style_filters.intersection(entity_dance_styles):
                 results[data_id] = data
                 continue
+        
+        if len(query_tokens) == 0:
+            continue
 
         entity_name_tokens = entity_name_data.split()
         if match_tokens(query_tokens, entity_name_tokens, dance_styles_tokens):
             results[data_id] = data
-    logging.info(results)
-    logging.info(f"Total results found: {len(results)}")
-    return results
-
-
-def full_text_search1(query, dance_style='', cache=[], entity="Studio"):
-    logging.info("FTS")
-    logging.debug(len(cache))
-    results = []
-    dance_style_field_name = collection_danceStyles_field.get(entity, 'danceStyles')
-    entity_name_field = collection_name_field.get(entity, 'studioName')
-
-    # Preprocessing & Tokenisation of query and dance_style filters
-    query_tokens = query.lower().split()
-    dance_style_filters = set(map(str.strip, dance_style.lower().split(',')))
-
-    for data in cache:
-        # Retrieve dance styles and entity name from cache
-        dance_styles_data = data.get(dance_style_field_name, "")
-        entity_name_data = data.get(entity_name_field, "").lower()
-
-        # Tokenize dance styles data from cache to a set of tokens
-        if isinstance(dance_styles_data, str):
-            entity_dance_styles = set(map(str.strip, dance_styles_data.lower().split(',')))
-            dance_styles_tokens = dance_styles_data.lower().split(',')
-        elif isinstance(dance_styles_data, list):
-            entity_dance_styles = set(map(lambda x: x.strip().lower(), dance_styles_data))
-            dance_styles_tokens = [style.lower() for style in dance_styles_data]
-        else:
-            entity_dance_styles = set()
-            dance_styles_tokens = []
-
-        if len(query_tokens) == 0 and not len(dance_style_filters)==0:
-            results.append(data)
-            continue
-
-        if dance_style_filters:
-            if dance_style_filters.intersection(entity_dance_styles):
-                results.append(data)
-                continue
-
-        entity_name_tokens = entity_name_data.split()
-        if match_tokens(query_tokens, entity_name_tokens, dance_styles_tokens):
-            results.append(data)
-
+    #logging.info(results)
     logging.info(f"Total results found: {len(results)}")
     return results

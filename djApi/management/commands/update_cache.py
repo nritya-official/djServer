@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 collection_fields = {
     'Studio': ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId', 'geolocation', 'street'],
     'Workshops': ['city', 'workshopName', 'time', 'date', 'level', 'danceStyles','StudioId','price'],
-    'OpenClasses': ['city', 'date', 'active', 'danceStyle', 'level', 'time', 'venue', 'openClassName','StudioId','price'],
+    'OpenClasses': ['city', 'date', 'active', 'danceStyles', 'level', 'time', 'venue', 'openClassName','StudioId','price'],
     'Courses': ['city', 'date', 'level', 'workshopName','courseName','venue', 'time', 'danceStyles','StudioId','price']
 }
 
