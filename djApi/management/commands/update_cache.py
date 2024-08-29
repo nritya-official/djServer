@@ -116,8 +116,10 @@ def process_collection(collection_name, allowed_fields, rc, db):
         city = data.get("city", "")
         if city:
             if city not in data_source:
-                data_source[city] = []
-            data_source[city].append(data)
+                #data_source[city] = []
+                data_source[city] = {None:None}
+            #data_source[city].append(data)
+            data_source[city][data["id"]] = data
 
             item_name = data.get(collection_name_field[collection_name], "")
             if item_name:
