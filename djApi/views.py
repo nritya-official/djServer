@@ -164,19 +164,24 @@ def landingPageImages(request):
 
 @api_view(['GET'])
 def search(request):
-    query = request.GET.get("query", "")
     city = request.GET.get("city", "New Delhi")
-    dance_style = request.GET.get("danceStyle", "")
     entity = request.GET.get("entity", "Studio")
+
+    query = request.GET.get("query", "")
+    dance_style = request.GET.get("danceStyle", "")
+    level = request.GET.get("level", "All")
+    price = request.GET.get("price", 10**10)
+    
     user_location = (float(request.GET.get("user_lat", 0)), float(request.GET.get("user_lon", 0)))
-    logging.info(entity)
+
+    logging.info(f"FTS parameters {query}, {city}, {dance_style}, {entity}, {level}, {price}, {user_location}")
     if city is None or city == 'null':
         return {}
     try:
         cache_key = f"{city.lower()}-{entity}"
         cached_data = json.loads(rc.get(cache_key) or '{}')
         logging.info("Before FTS")
-        results = full_text_search(query, dance_style, cached_data, entity=entity)
+        results = full_text_search(query, dance_style, cached_data, entity=entity,level=level, price=price)
         # logging.info(results)
         distance = int(request.GET.get("distance", 20))
         if user_location != (0, 0):
