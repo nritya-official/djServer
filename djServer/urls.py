@@ -34,4 +34,5 @@ urlpatterns = [
     path('api/', include('djApi.urls')),
     path('bookings/', include('djBookings.urls')),
     path('emailer/', include('emailer.urls')),
+    path('payments/', include('payments.urls')),
 ]

@@ -20,11 +20,9 @@ curl -X POST -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ0MjY5YTE3M
 
 https://nrityaserver-2b241e0a97e5.herokuapp.com/api/search/?&city=Surat&entity=Workshops
 
-
 http://127.0.0.1:8000/api/search/?&city=Surat&entity=Workshops&query="wonkshonp"
 http://127.0.0.1:8000/api/search/?&city=Surat
 
-http://127.0.0.1:8000/api/search/?&city=Surat&entity=Workshops&danceStyles=Swing
 http://127.0.0.1:8000/api/search/?&city=Surat&entity=Workshops&level=Intermediate,Beginner
 http://127.0.0.1:8000/api/search/?&city=Surat&entity=Workshops&level=Intermediate,Beginner&danceStyle=Kuchipudi
 http://127.0.0.1:8000/api/search/?&city=Surat&entity=Workshops&level=Intermediate,Beginner&danceStyle=Kuchipudi&price=1499
@@ -34,13 +32,13 @@ http://127.0.0.1:8000/api/search/?&city=Patna&danceStyle=Swing&entity=Studio
 
 http://127.0.0.1:8000/api/search/?&city=Surat&entity=Workshops&danceStyle=Swing
 http://127.0.0.1:8000/api/search/?&city=Surat&entity=Courses&danceStyle=Kuchipudi
-http://127.0.0.1:8000/api/search/?&city=Patna&danceStyle=Swing,Kuchipudi,Irish%20Dance
+http://127.0.0.1:8000/api/search/?&city=Patna&danceStyle=Swing,Kuchipudi,Irish Dance
 http://127.0.0.1:8000/api/search/?&city=Surat&entity=Workshops&level=Intermediate&price=1499&danceStyle=Irish Dance,Swing
 
 
 
 entity = STUDIO:
-     city -> danceStyle -> [rating] -> query ->distance
+     city -> danceStyle -> query ->distance
 
 entity = WORKSHOPS, COURSES:
      city -> danceStyle -> [level -> price] -> query -> distance

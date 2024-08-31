@@ -5,7 +5,7 @@ import json
 from fuzzywuzzy import fuzz
 import redis
 from django.core.cache import cache
-from djApi.flags import FIREBASE_DB,FIREBASE_CREDENTIALS,STORAGE_BUCKET
+from djApi.flags import FIREBASE_DB, FIREBASE_CREDENTIALS, STORAGE_BUCKET, COLLECTIONS
 from geopy.distance import geodesic
 import time
 import datetime
@@ -14,24 +14,24 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 collection_fields = {
-    'Studio': ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId', 'geolocation', 'street'],
-    'Workshops': ['city', 'workshopName', 'time', 'date', 'level', 'danceStyles','StudioId','price'],
-    'OpenClasses': ['city', 'date', 'active', 'danceStyles', 'level', 'time', 'venue', 'openClassName','StudioId','price'],
-    'Courses': ['city', 'date', 'level', 'workshopName','courseName','venue', 'time', 'danceStyles','StudioId','price']
+    COLLECTIONS.STUDIO : ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId', 'geolocation', 'street'],
+    COLLECTIONS.WORKSHOPS : ['city', 'workshopName', 'time', 'date', 'level', 'danceStyles','StudioId','price'],
+    COLLECTIONS.OPENCLASSES : ['city', 'date', 'active', 'danceStyles', 'level', 'time', 'venue', 'openClassName','StudioId','price'],
+    COLLECTIONS.COURSES : ['city', 'date', 'level', 'workshopName','courseName','venue', 'time', 'danceStyles','StudioId','price']
 }
 
 collection_icon ={
-    'Studio' : 'StudioIcon',
-    'Workshops' : 'WorkshopIcon',
-    'OpenClasses' : 'OpenClassIcon',
-    'Courses' : 'CourseIcon'
+    COLLECTIONS.STUDIO : 'StudioIcon',
+    COLLECTIONS.WORKSHOPS : 'WorkshopIcon',
+    COLLECTIONS.OPENCLASSES : 'OpenClassIcon',
+    COLLECTIONS.COURSES : 'CourseIcon'
 }
 
 collection_name_field ={
-    'Studio' : 'studioName',
-    'Workshops' : 'workshopName',
-    'OpenClasses' : 'openClassName',
-    'Courses' : 'workshopName'
+    COLLECTIONS.STUDIO : 'studioName',
+    COLLECTIONS.WORKSHOPS : 'workshopName',
+    COLLECTIONS.OPENCLASSES : 'openClassName',
+    COLLECTIONS.COURSES : 'workshopName'
 }
 
 class Command(BaseCommand):
@@ -78,7 +78,7 @@ def update_cache(rc):
         globals()['STORAGE_BUCKET'] = storage.bucket(app=app)
 
     db = firebase_admin.firestore.client()
-    collections = ['Studio', 'Workshops', 'OpenClasses', 'Courses']
+    collections = [COLLECTIONS.STUDIO, COLLECTIONS.WORKSHOPS, COLLECTIONS.OPENCLASSES, COLLECTIONS.COURSES]
     
     for collection in collections:
         process_collection(collection, collection_fields[collection], rc,db)

@@ -11,6 +11,7 @@ import json
 import logging
 import redis
 from rest_framework.decorators import api_view
+from djApi.flags import FIREBASE_DB, FIREBASE_CREDENTIALS, STORAGE_BUCKET, COLLECTIONS
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 
 rc = redis.Redis(
@@ -41,7 +42,7 @@ def get_all_data(request):
 def studioFullPage(request, studioId):
 
     db = firestore.client()
-    doc_ref = db.collection("Studio").document(studioId)
+    doc_ref = db.collection(COLLECTIONS.STUDIO).document(studioId)
 
     doc = doc_ref.get()
     if doc.exists:
@@ -65,7 +66,7 @@ def studioFullPage(request, studioId):
 
 def get_studio_data(studioId):
     db = firestore.client()
-    doc_ref = db.collection("Studio").document(studioId)
+    doc_ref = db.collection(COLLECTIONS.STUDIO).document(studioId)
 
     doc = doc_ref.get()
     if doc.exists:
@@ -108,8 +109,8 @@ def studioRatingChange(request):
     db = firestore.client()
     ratingsId = userId + "_" + studioId
 
-    ratings_ref = db.collection("Ratings").document(ratingsId)
-    studio_ref = db.collection("Studio").document(studioId)
+    ratings_ref = db.collection(COLLECTIONS.RATINGS).document(ratingsId)
+    studio_ref = db.collection(COLLECTIONS.STUDIO).document(studioId)
 
     ratings_doc = ratings_ref.get()
 
@@ -144,7 +145,7 @@ def getStudioRating(request,studioId,userId):
 
     ratingsId = userId + "_" + studioId
     db = firestore.client()
-    ratings_ref = db.collection("Ratings").document(ratingsId)
+    ratings_ref = db.collection(COLLECTIONS.RATINGS).document(ratingsId)
     ratings_doc = ratings_ref.get()
 
     if ratings_doc.exists:
@@ -165,7 +166,7 @@ def landingPageImages(request):
 @api_view(['GET'])
 def search(request):
     city = request.GET.get("city", "New Delhi")
-    entity = request.GET.get("entity", "Studio")
+    entity = request.GET.get("entity", COLLECTIONS.STUDIO)
 
     query = request.GET.get("query", "")
     dance_style = request.GET.get("danceStyle", "")
@@ -206,7 +207,7 @@ def search1(request):
     query = request.GET.get("query", "")
     city = request.GET.get("city", "New Delhi")
     dance_style = request.GET.get("danceStyle", "")
-    entity = request.GET.get("entity", "Studio")
+    entity = request.GET.get("entity", COLLECTIONS.STUDIO)
     user_location = (float(request.GET.get("user_lat", 0)), float(request.GET.get("user_lon", 0)))
     logging.info(entity)
     try:
@@ -239,7 +240,7 @@ def search1(request):
 def autocomplete(request):
     #studio_name_query = request.GET.get('query', '').lower()
     city = request.GET.get('city', '').lower()
-    entity = request.GET.get("entity", "Studio")
+    entity = request.GET.get("entity", COLLECTIONS.STUDIO)
     key = city.lower()+"-"+entity+'-'+"Lite"
     studio_names_json = rc.get(key)
     logging.info(studio_names_json)

@@ -4,7 +4,7 @@ from fuzzywuzzy import fuzz
 import redis
 import logging
 from django.core.cache import cache
-from djApi.flags import FIREBASE_DB
+from djApi.flags import FIREBASE_DB, COLLECTIONS
 from geopy.distance import geodesic
 
 logging.basicConfig(level=logging.INFO)
@@ -24,89 +24,6 @@ def calculate_distance(location1, location2):
     logging.info("{} {} = {}".format(location1,location2,distance))
     return distance
 
-def update_cache_old(rc):
-    print("Cache updating....")
-    logging.info("Cache updating...")
-    x = True
-    try:
-        db = firebase_admin.firestore.client()
-        docs = db.collection('Studio').stream()
-        data_source = {}
-
-        for doc in docs:
-            data = {}
-            for field, value in doc.to_dict().items():
-                allowed_fields = ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId','geolocation']
-                if field in allowed_fields:
-                    if isinstance(value, firebase_admin.firestore.DocumentReference):
-                        data[field] = value.id
-                    else:
-                        data[field] = value
-            data["studioId"] = doc.id
-            x =  False
-            # Organize data by city in the cache
-            city = data.get("city", "")
-            logging.info(city)
-            if city:
-                if city not in data_source:
-                    data_source[city] = []
-                data_source[city].append(data)
-        for city, studios in data_source.items():
-            rc.set(city.lower(), json.dumps(studios))
-            cached_data = rc.get(city.lower())
-            #logging.info(json.loads(cached_data) if cached_data else [])
-
-
-        print("Cache updated successfully")
-        #logging.info(data_source)
-        logging.info("Cache updated successfully")
-    except Exception as e:
-        #print("Error updating cache:", e)
-        logging.error("Error updating cache: ", e)
-
-def update_cache(rc):
-    logging.info("Cache updating....")
-    db = firebase_admin.firestore.client()
-    docs = db.collection('Studio').stream()
-    data_source = {}
-    city_studio_names = {}
-
-    for doc in docs:
-        data = {}
-        for field, value in doc.to_dict().items():
-            allowed_fields = ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId','geolocation','street']
-            if field in allowed_fields:
-                if isinstance(value, firebase_admin.firestore.DocumentReference):
-                    data[field] = value.id
-                else:
-                    data[field] = value
-        data["studioId"] = doc.id
-
-        # Organize data by city in the cache
-        city = data.get("city", "")
-        if city:
-            if city not in data_source:
-                data_source[city] = []
-            data_source[city].append(data)
-
-            studio_name = data.get("studioName", "")
-            if studio_name:
-                if city not in city_studio_names:
-                    city_studio_names[city] = set()
-                city_studio_names[city].add(studio_name)
-
-    
-    for city, studios in data_source.items():
-        rc.set(city.lower(), json.dumps(studios))
-        cached_data = rc.get(city.lower())
-
-    # Save city_studio_names data in Redis
-    for city, studio_names in city_studio_names.items():
-        rc.set(f"{city.lower()}-Lite", json.dumps(list(studio_names)))
-    
-    logging.info("Cache updated successfully")
-
-
 def autocomplete(cache, query):
     results = []
 
@@ -119,18 +36,18 @@ def autocomplete(cache, query):
 
 
 collection_name_field ={
-    'Studio' : 'studioName',
-    'Workshops' : 'workshopName',
-    'OpenClasses' : 'openClassName',
-    'Courses' : 'workshopName'
+    COLLECTIONS.STUDIO : 'studioName',
+    COLLECTIONS.WORKSHOPS : 'workshopName',
+    COLLECTIONS.OPENCLASSES : 'openClassName',
+    COLLECTIONS.COURSES : 'workshopName'
 }
 
 
 collection_danceStyles_field ={
-    'Studio' : 'danceStyles',
-    'Workshops' : 'danceStyles',
-    'OpenClasses' : 'danceStyle',
-    'Courses' : 'danceStyles'
+    COLLECTIONS.STUDIO : 'danceStyles',
+    COLLECTIONS.WORKSHOPS : 'danceStyles',
+    COLLECTIONS.OPENCLASSES : 'danceStyle',
+    COLLECTIONS.COURSES : 'danceStyles'
 }
 
 def fuzzy_match(token1, token2, threshold):
@@ -150,7 +67,7 @@ def filter_by_level(data, level_filters, entity):
     if not level_filters or "all" in level_filters:
         return True  
 
-    if entity != "Studio":
+    if entity != COLLECTIONS.STUDIO:
         entity_level = data.get("level", "All").lower()
         if entity_level == "all" or entity_level in level_filters:
             return True
@@ -159,7 +76,7 @@ def filter_by_level(data, level_filters, entity):
 
 
 def filter_by_price(data, price_filter, entity):
-    if price_filter and entity in ['Workshops', 'Courses']:
+    if price_filter and entity in [COLLECTIONS.WORKSHOPS, COLLECTIONS.COURSES]:
         entity_price = int(data.get("price", 0))
         if entity_price > price_filter:
             return False
@@ -187,7 +104,7 @@ def filter_by_query(query_tokens, entity_name_tokens):
         return True
     return match_tokens(query_tokens, entity_name_tokens)
 
-def full_text_search(query, dance_style='', cache={}, entity="Studio", level="All", price=10**10):
+def full_text_search(query, dance_style='', cache={}, entity=COLLECTIONS.STUDIO, level="All", price=10**10):
     logging.info(f"FTS: Cache length {len(cache)}")
     results = {}
     dance_style_field_name = collection_danceStyles_field.get(entity, 'danceStyles')
@@ -206,11 +123,11 @@ def full_text_search(query, dance_style='', cache={}, entity="Studio", level="Al
         if data_id == 'null' or data is None:
             continue
 
-        if entity != 'Studio':
+        if entity != COLLECTIONS.STUDIO:
             if not filter_by_level(data, level_filter, entity):
                 continue
 
-        if entity in ['Workshops','OpenClasses']:
+        if entity in [COLLECTIONS.WORKSHOPS,COLLECTIONS.OPENCLASSES]:
             if not filter_by_price(data, price_filter, entity):
                 continue
 

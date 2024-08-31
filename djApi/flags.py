@@ -12,6 +12,13 @@ FIREBASE_AUTH = None
 class COLLECTIONS:
     USER = 'User'
     STUDIO = 'Studio'
+    COURSES = 'Courses'
+    OPENCLASSES = 'OpenClasses'
+    WORKSHOPS = 'Workshops'
+    BOOKINGS = 'Bookings'
+    RATINGS = 'Ratings'
+    USER_KYC = 'UserKyc'
+    TRANSACTIONS = 'Transactions'
     FREE_TRIAL_BOOKINGS = 'FreeTrialBookings'
     INSTRUCTORS = 'Instructors'
 

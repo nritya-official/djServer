@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'djApi',
     'djBookings',
     'emailer',
+    'payments',
     'rest_framework_swagger',
     'rest_framework',
 ]
