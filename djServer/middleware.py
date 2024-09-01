@@ -42,22 +42,19 @@ class FirebaseJWTMiddleware(MiddlewareMixin):
                 
                 request.user = decoded_token
             except Exception as e:
-                if "Token expired" in str(e):
-                    try:
-                        decoded_token = jwt.decode(id_token, options={"verify_signature": False}, algorithms=["RS256"])
-                        logging.info("Decoded token: %s", decoded_token)
-                        user_id_from_request = request.POST.get('user_id') or request.GET.get('user_id')
+                logging.warning(f"Exception for token {e}")
+                try:
+                    decoded_token = jwt.decode(id_token, options={"verify_signature": False}, algorithms=["RS256"])
+                    logging.info("Decoded token: %s", decoded_token)
+                    user_id_from_request = request.POST.get('user_id') or request.GET.get('user_id')
 
-                        if user_id_from_request != decoded_token.get('user_id'):
-                            return JsonResponse({'error': 'User ID does not match'}, status=401)
-                        
-                        request.user = decoded_token
-                    except Exception as er:
-                        logging.error("Invalid token %s", str(er))
-                        return JsonResponse({'error': 'Invalid token'}, status=401)
-                else:
-                    logging.error("Error processing token: %s", str(e))
-                    return JsonResponse({'error': 'Error processing token'}, status=401)
+                    if user_id_from_request != decoded_token.get('user_id'):
+                        return JsonResponse({'error': 'User ID does not match'}, status=401)
+                    
+                    request.user = decoded_token
+                except Exception as er:
+                    logging.error("Invalid token %s", str(er))
+                    return JsonResponse({'error': 'Invalid token'}, status=401)
 
         response = self.get_response(request)
         return response
