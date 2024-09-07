@@ -4,7 +4,8 @@ def times_us():
   """
   Returns the integer Epoch time in microseconds.
   """
-  return int(time.time() * 1e6)
+  gmt_time = time.gmtime()  # Get GMT time
+  return int(time.mktime(gmt_time) * 1e6)
 
 def get_reversed_dictionary(input_dict):
   """

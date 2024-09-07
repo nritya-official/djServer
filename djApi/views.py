@@ -201,41 +201,6 @@ def search(request):
         logging.error("Error searching: ", e)
         return JsonResponse({"error": "Internal Server Error"}, status=500)
 
-
-@api_view(['GET'])
-def search1(request):
-    query = request.GET.get("query", "")
-    city = request.GET.get("city", "New Delhi")
-    dance_style = request.GET.get("danceStyle", "")
-    entity = request.GET.get("entity", COLLECTIONS.STUDIO)
-    user_location = (float(request.GET.get("user_lat", 0)), float(request.GET.get("user_lon", 0)))
-    logging.info(entity)
-    try:
-        cache_key = city.lower()
-        cache_key = cache_key + "-" + entity
-        logging.info(entity)
-        cached_data = json.loads(rc.get(cache_key) or '[]')
-        #if entity != 'Studio':
-            #return JsonResponse(cached_data, safe=False)
-        
-        results = full_text_search(query, dance_style, cached_data,entity=entity)
-        distance = int(request.GET.get("distance", 20))
-        if user_location != (0, 0):
-            filtered_results = []
-            for result in results:
-                if result.get("geolocation") :
-                    distance_in_kms =  calculate_distance(user_location,(float(result["geolocation"]["lat"]), float(result["geolocation"]["lng"])))
-                    if(distance_in_kms <= distance):
-                        result["distance_in_kms"] = round(distance_in_kms, 2)
-                        filtered_results.append(result)
-            results = filtered_results
-
-        logging.info("results length: {}".format(len(results)))
-        return JsonResponse(results, safe=False)
-    except Exception as e:
-        logging.error("Error searching: ", e)
-        return JsonResponse({"error": "Internal Server Error"}, status=500)
-
 @api_view(['GET'])
 def autocomplete(request):
     #studio_name_query = request.GET.get('query', '').lower()

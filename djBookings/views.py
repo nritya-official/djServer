@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from djApi.flags import FIREBASE_DB, COLLECTIONS, nSuccessCodes
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
 from .flags import FLAGS
+from utils.common_utils import *
 import json
 import logging
 import firebase_admin.firestore
@@ -198,3 +199,59 @@ def freeTrial(request):
         logging.info(request.method)
         return JsonResponse("This is the free trial endpoint. Send a POST request to start the free trial.",safe=False)
 
+@api_view(['POST'])
+def bookSlot(request):
+    entity_type = request.POST.get('entity_type')
+    entity_id = request.POST.get('entity_id')
+    studio_id = request.POST.get('studio_id')
+    user_id = request.POST.get('user_id')
+    final_price = request.POST.get('final_price',0)
+    already_paid = request.POST.get('already_paid',0)
+
+    if not user_id or not studio_id or not entity_type or not entity_id:
+        return JsonResponse("Missing one or more parameter")
+
+    if float(final_price) != 0.0 and (float(final_price) - float(already_paid))>0:
+        msg = f'{(float(final_price) - float(already_paid))} amount to be paid at venue.'
+    elif float(final_price) == 0.0:
+        msg = "Free !"
+    else:
+        msg = "Already paid. No further payment required."
+
+    timestamp = times_gmt()
+    bookings_data = {
+        'entity_type':entity_type,
+        'entity_id': entity_id,
+        'studio_id': studio_id,
+        'user_id': user_id,
+        'final_price': final_price,
+        'already_paid': already_paid,
+        'msg': msg
+    }
+    _ , result_ref = FIREBASE_DB.collection(COLLECTIONS.BOOKINGS).add(bookings_data)
+    if(result_ref.id):
+        return JsonResponse(f"Booked Successfully {result_ref.id}")
+    else:
+        return JsonResponse("Not booked.")
+
+@api_view(['GET'])
+def getUserBookings(request):
+    logging.info("getUserBookings")
+    user_id = request.GET.get('user_id')
+
+    if not user_id:
+        return JsonResponse({"error": "Missing user_id parameter"}, status=400)
+
+    if not user_id :
+        return JsonResponse("Missing one or more parameter")
+
+    docs = (FIREBASE_DB.collection(COLLECTIONS.BOOKINGS).where(
+                filter=FieldFilter('UserId',"==",user_id)).stream())
+    if(docs):
+        result = []
+        for doc in docs:
+            result.append(doc.to_dict())
+        logging.info(result)
+        return JsonResponse(result, safe=False,status=200)
+    else:
+        return JsonResponse({"error": str(e)}, status=500)
