@@ -46,7 +46,7 @@ collection_name_field ={
 collection_danceStyles_field ={
     COLLECTIONS.STUDIO : 'danceStyles',
     COLLECTIONS.WORKSHOPS : 'danceStyles',
-    COLLECTIONS.OPENCLASSES : 'danceStyle',
+    COLLECTIONS.OPENCLASSES : 'danceStyles',
     COLLECTIONS.COURSES : 'danceStyles'
 }
 
@@ -92,7 +92,7 @@ def filter_by_dance_style(data, dance_style_filters, dance_style_field_name):
         entity_dance_styles = set(map(lambda x: x.strip().lower(), dance_styles_data))
     else:
         entity_dance_styles = set()
-    logging.debug(f"{dance_style_filters} --- {entity_dance_styles}")
+    logging.info(f"{dance_style_filters} --- {entity_dance_styles}")
     if dance_style_filters:
         match_set = dance_style_filters.intersection(entity_dance_styles)
         if len(match_set) == 0:
@@ -105,11 +105,11 @@ def filter_by_query(query_tokens, entity_name_tokens):
     return match_tokens(query_tokens, entity_name_tokens)
 
 def full_text_search(query, dance_style='', cache={}, entity=COLLECTIONS.STUDIO, level="All", price=10**10):
-    logging.info(f"FTS: Cache length {len(cache)}")
+    logging.info(f"FTS: Cache length {len(cache)}; entity{entity}; dance_style{dance_style}; level {level}")
     results = {}
     dance_style_field_name = collection_danceStyles_field.get(entity, 'danceStyles')
     entity_name_field = collection_name_field.get(entity, 'studioName')
-
+    logging.debug(dance_style_field_name)
     # Preprocessing & Tokenization of query and dance_style filters
     query_tokens = query.lower().split()
     if dance_style:
