@@ -46,3 +46,14 @@ entity = WORKSHOPS, COURSES:
 
 entity = OPEN CLASSES:
      city -> danceStyle -> [level] -> query -> distance
+
+ayushraj@Y46TH2QMFW djServer % curl -X POST http://localhost:8000/djSms/request_otp/ \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "phone_number=9521747207"
+
+ayushraj@Y46TH2QMFW djServer % curl -X POST http://localhost:8000/djSms/confirm_otp/ \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "phone_number=9521747207" \
+     -d "otp=3384"
+
+{"status": "success", "message": "OTP verified successfully!"}% 

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'emailer',
     'payments',
     'reports',
+    'djSms',
     'rest_framework_swagger',
     'rest_framework',
 ]

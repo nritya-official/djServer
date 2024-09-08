@@ -36,4 +36,5 @@ urlpatterns = [
     path('emailer/', include('emailer.urls')),
     path('payments/', include('payments.urls')),
     path('reports/', include('reports.urls')),
+    path('djSms/', include('djSms.urls'))
 ]
