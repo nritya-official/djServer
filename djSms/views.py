@@ -29,7 +29,8 @@ def store_otp(phone_number, otp):
     phone_number = "+91" + phone_number
     expiration_time = 300  # 5 minutes
     cache.set(f'otp_{phone_number}', otp, timeout=expiration_time)
-    logging.debug(cache.get(f'otp_{phone_number}'))
+    logging.info(cache.get(f'otp_{phone_number}'))
+    logging.info(f"Saved for otp_{phone_number}")
 
 # Utility function to verify OTP
 def _verify_otp(phone_number, user_otp):
