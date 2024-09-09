@@ -36,17 +36,19 @@ def _verify_otp(phone_number, user_otp):
     phone_number = "+91" + phone_number
     logging.debug(f'{phone_number}.')
     stored_otp = cache.get(f'otp_{phone_number}')
-    logging.debug(f'{phone_number} - {stored_otp}')
-    if stored_otp is not None and str(stored_otp) == str(user_otp):
+    logging.debug(f'{phone_number} - {stored_otp} - {user_otp}')
+    if stored_otp is not None and user_otp and str(stored_otp) == str(user_otp):
+        logging.info(f'{phone_number} verified')
         return True
     return False
 
 # 1. Endpoint to request OTP generation
 @csrf_exempt
 def request_otp(request):
+    logging.debug("request_otp")
     if request.method == 'POST':
         phone_number = request.POST.get('phone_number')
-
+        logging.debug(f"request_otp {phone_number}")
         if phone_number:
             otp = generate_otp()
             store_otp(phone_number, otp)
@@ -60,10 +62,11 @@ def request_otp(request):
 # 2. Endpoint to verify the OTP
 @csrf_exempt
 def confirm_otp(request):
+    logging.debug("confirm_otp")
     if request.method == 'POST':
         phone_number = request.POST.get('phone_number')
         user_otp = request.POST.get('otp')
-        logging.info(f'{phone_number} - {user_otp}')
+        logging.debug(f'confirm_otp {phone_number} - {user_otp}')
         if phone_number and user_otp:
             if _verify_otp(phone_number, user_otp):
                 return JsonResponse({"status": "success", "message": "OTP verified successfully!"})
