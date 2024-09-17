@@ -11,7 +11,7 @@ import json
 import logging
 import redis
 from rest_framework.decorators import api_view
-from djApi.flags import FIREBASE_DB, FIREBASE_CREDENTIALS, STORAGE_BUCKET, COLLECTIONS
+from djApi.flags import FIREBASE_DB, FIREBASE_CREDENTIALS, STORAGE_BUCKET, COLLECTIONS, STORAGE_FOLDER
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 
 rc = redis.Redis(
@@ -51,7 +51,7 @@ def studioFullPage(request, studioId):
 
         return JsonResponse({"error": "No such document!"}, status=404)
 
-    path = "StudioImages/{}/".format(studioId)
+    path = STORAGE_FOLDER.STUDIO_IMAGES+"/{}/".format(studioId)
     logging.info(path)
     blobs = STORAGE_BUCKET.list_blobs(prefix=path, delimiter="/")
     signed_urls = []
@@ -60,7 +60,7 @@ def studioFullPage(request, studioId):
         for blob in blobs:
             signed_url = blob.generate_signed_url(datetime.timedelta(seconds=600), method='GET')
             signed_urls.append(signed_url)
-    studio_data['studioImages'] = signed_urls
+    studio_data[STORAGE_FOLDER.STUDIO_IMAGES] = signed_urls
 
     return JsonResponse(studio_data)
 
@@ -74,8 +74,8 @@ def get_studio_data(studioId):
     else:
         return None
 
-def get_signed_urls(studioId):
-    path = f"StudioImages/{studioId}/"
+def get_signed_urls(studioId,storageFolder):
+    path = f"{storageFolder}/{studioId}/"
     blobs = STORAGE_BUCKET.list_blobs(prefix=path, delimiter="/")
     signed_urls = []
 
@@ -96,8 +96,10 @@ def studioTextData(request, studioId):
 
 @api_view(['GET'])
 def studioImageURLs(request, studioId):
-    signed_urls = get_signed_urls(studioId)
-    return JsonResponse({"studioImages": signed_urls})
+    signed_urls_si = get_signed_urls(studioId, STORAGE_FOLDER.STUDIO_IMAGES)
+    signed_urls_sa = get_signed_urls(studioId, STORAGE_FOLDER.STUDIO_ANNOUNCEMENTS)
+    return JsonResponse({STORAGE_FOLDER.STUDIO_IMAGES: signed_urls_si,
+             STORAGE_FOLDER.STUDIO_ANNOUNCEMENTS:signed_urls_sa})
 
 
 @api_view(['GET'])

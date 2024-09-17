@@ -22,6 +22,12 @@ class COLLECTIONS:
     FREE_TRIAL_BOOKINGS = 'FreeTrialBookings'
     INSTRUCTORS = 'Instructors'
 
+class STORAGE_FOLDER:
+    STUDIO_IMAGES = 'StudioImages'
+    STUDIO_ANNOUNCEMENTS = 'StudioAnnouncements'
+    STUDIO_ICON = 'StudioIcon'
+
+
 class nSuccessCodes:
     CREATED = 201
     ALREADY_BOOKED = 202
