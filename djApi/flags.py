@@ -42,7 +42,7 @@ def init_firebase():
     global FIREBASE_DB_ASYNC
     FIREBASE_DB_ASYNC = firestore_async.client()
     app = firebase_admin.initialize_app(FIREBASE_CREDENTIALS, {
-        'storageBucket': 'nritya-7e526.appspot.com',
+        'storageBucket': 'nritya-7e526.appspot.com', 
     }, name='storage')
 
     global STORAGE_BUCKET 
