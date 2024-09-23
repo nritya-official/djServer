@@ -17,6 +17,7 @@ class nSuccessCodes:
     ACCEPTED = 202  # Request accepted but not yet processed
     NO_CONTENT = 204  # Request successful but no content to return
     BOOKING_SUCCESS = 200  # Request successful
+    SUCCESS = 200
     ALREADY_BOOKED = 205
 
     # Client Error Codes

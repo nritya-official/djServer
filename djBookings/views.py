@@ -277,38 +277,49 @@ def getUserBookings(request, user_id):
 
             # Define sync fetch function
             def fetch_bookings(collection):
-                query_results = collection.where("user_id", "==", user_id).where("timestamp", ">", time_filter).stream()
-                logging.info("Get entity bookings query_results %s" %query_results)
-                if query_results:
-                    return [doc.to_dict() for doc in query_results]
-                return []
+                docs = collection.where(filter=FieldFilter("user_id", "==", user_id)).where(filter=FieldFilter("timestamp", ">", time_filter)).stream()
+                result = {}
+                
+                for doc in docs:
+                    try:
+                        uuid = doc.id
+                        if uuid:
+                            result[uuid] = doc.to_dict()
+                            logging.info(uuid)
+                    except AttributeError as e:
+                        logging.info("Error accessing doc.id: %s", str(e))
+
+                return result
+                
             logging.info("Get entity bookings")
-            # Fetch bookings sequentially (sync version)
+
             bookings_ref = FIREBASE_DB.collection(COLLECTIONS.BOOKINGS)
             free_trial_bookings_ref = FIREBASE_DB.collection(COLLECTIONS.FREE_TRIAL_BOOKINGS)
             
-            # Fetch bookings synchronously
+
             bookings_results = fetch_bookings(bookings_ref)
             free_trial_results = fetch_bookings(free_trial_bookings_ref)
 
             categorized_bookings = {
                 COLLECTIONS.FREE_TRIAL_BOOKINGS: free_trial_results,  # Free trial bookings
-                COLLECTIONS.WORKSHOPS: [],
-                COLLECTIONS.OPEN_CLASSES: [],
-                COLLECTIONS.COURSES: []
+                COLLECTIONS.WORKSHOPS: {},
+                COLLECTIONS.OPEN_CLASSES: {},
+                COLLECTIONS.COURSES: {},
             }
+            logging.info(bookings_results)
+            for booking_id, booking_data in bookings_results.items():
+                entity_type = booking_data['entity_type']
+                
+                # Categorize based on entity_type
+                if entity_type == 'Workshops':
+                    categorized_bookings[COLLECTIONS.WORKSHOPS][booking_id] = booking_data
+                elif entity_type == 'OpenClasses':
+                    categorized_bookings[COLLECTIONS.OPEN_CLASSES][booking_id] = booking_data
+                elif entity_type == 'Courses':
+                    categorized_bookings[COLLECTIONS.COURSES][booking_id] = booking_data
 
-            for booking_data in bookings_results:  # Main bookings
-                booking_data["id"] = booking_data.id
-                entity_name = booking_data.get('entity_name', '').lower()
-
-                if COLLECTIONS.WORKSHOPS in entity_name:
-                    categorized_bookings[COLLECTIONS.WORKSHOPS].append(booking_data)
-                elif COLLECTIONS.OPEN_CLASSES in entity_name:
-                    categorized_bookings[COLLECTIONS.OPEN_CLASSES].append(booking_data)
-                elif COLLECTIONS.COURSES in entity_name:
-                    categorized_bookings[COLLECTIONS.COURSES].append(booking_data)
-
+                    # Optionally handle unexpected entity types if necessary
+                    logging.warning(f"Unexpected entity_type: {entity_type}")
             return JsonResponse({
                 'nSuccessCode': nSuccessCodes.SUCCESS,
                 'message': 'Bookings retrieved successfully',
