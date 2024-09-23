@@ -7,6 +7,6 @@ urlpatterns = [
     path('bookEntity/', bookEntity, name='bookEntity'),
     path('availFreeTrial/<str:booking_id>', availFreeTrial, name='availFreeTrial'),
     path('availFreeTrialResults/', availFreeTrialResults, name='availFreeTrialResults'),
-    path('getUserBookings/', getUserBookings, name='getUserBookings'),
+    path('getUserBookings/<str:user_id>', getUserBookings, name='getUserBookings'),
     # Add more paths as needed availFreeTrialResults
 ]

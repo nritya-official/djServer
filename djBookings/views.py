@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt  
-from djApi.flags import FIREBASE_DB, FIREBASE_DB_ASYNC
+from djApi.flags import FIREBASE_DB
 from utils.common_utils import is_valid_entity_type, COLLECTIONS, nSuccessCodes
 from utils.redis_client import RedisClient
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
@@ -265,44 +265,40 @@ def bookEntity(request):
 
 @api_view(['GET'])
 @csrf_exempt
-async def getUserBookings(request):
+def getUserBookings(request, user_id):
     logging.info("Get entity bookings")
 
     if request.method == 'GET':
         try:
-            db = FIREBASE_DB_ASYNC
-            request_data = json.loads(request.body.decode('utf-8'))
-            user_id = request_data.get('userId')
+            db = FIREBASE_DB
             months = 1
 
             time_filter = time.time() - months * 30 * 24 * 60 * 60  # Past 30 days (optional)
 
-            # Define async fetch functions
-            async def fetch_bookings(collection):
-                query_results = await collection.where("user_id", "==", user_id).where("timestamp", ">", time_filter).stream()
-                return [doc.to_dict() for doc in query_results]
-
-            # Fetch bookings concurrently
+            # Define sync fetch function
+            def fetch_bookings(collection):
+                query_results = collection.where("user_id", "==", user_id).where("timestamp", ">", time_filter).stream()
+                logging.info("Get entity bookings query_results %s" %query_results)
+                if query_results:
+                    return [doc.to_dict() for doc in query_results]
+                return []
+            logging.info("Get entity bookings")
+            # Fetch bookings sequentially (sync version)
             bookings_ref = FIREBASE_DB.collection(COLLECTIONS.BOOKINGS)
             free_trial_bookings_ref = FIREBASE_DB.collection(COLLECTIONS.FREE_TRIAL_BOOKINGS)
-
-            # Create tasks for concurrent fetching
-            tasks = [
-                fetch_bookings(bookings_ref),
-                fetch_bookings(free_trial_bookings_ref)
-            ]
-
-            # Wait for all tasks to complete
-            results = await asyncio.gather(*tasks)
+            
+            # Fetch bookings synchronously
+            bookings_results = fetch_bookings(bookings_ref)
+            free_trial_results = fetch_bookings(free_trial_bookings_ref)
 
             categorized_bookings = {
-                COLLECTIONS.FREE_TRIAL_BOOKINGS: results[1],  # Free trial bookings
+                COLLECTIONS.FREE_TRIAL_BOOKINGS: free_trial_results,  # Free trial bookings
                 COLLECTIONS.WORKSHOPS: [],
                 COLLECTIONS.OPEN_CLASSES: [],
                 COLLECTIONS.COURSES: []
             }
 
-            for booking_data in results[0]:  # Main bookings
+            for booking_data in bookings_results:  # Main bookings
                 booking_data["id"] = booking_data.id
                 entity_name = booking_data.get('entity_name', '').lower()
 
