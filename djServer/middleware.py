@@ -22,7 +22,6 @@ class FirebaseJWTMiddleware(MiddlewareMixin):
             '/emailer/studioAdd/',
             '/emailer/studioUpdate/',
             '/emailer/freeTrialBookings/',
-            '/bookings/freeTrial'
         ]
 
     def __call__(self, request):

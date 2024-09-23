@@ -3,10 +3,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt  
-from djApi.flags import FIREBASE_DB, COLLECTIONS, nSuccessCodes
+from djApi.flags import FIREBASE_DB, FIREBASE_DB_ASYNC
+from utils.common_utils import is_valid_entity_type, COLLECTIONS, nSuccessCodes
+from utils.redis_client import RedisClient
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
 from .flags import FLAGS
-from utils.common_utils import *
 import json
 import logging
 import firebase_admin.firestore
@@ -107,9 +108,6 @@ def availFreeTrialResults(request):
         #return render(request, 'case2a.html', {'booking_id': booking_id, 'status': 'Invalid Booking Id'})  /home/ayush/Downloads/FreeTrialCases
         #return JsonResponse({'Booking Id': booking_id,'Status':'Invalid Booking Id'}) #invalid
 
-
-
-
 @api_view(['POST'])
 @csrf_exempt
 def freeTrial(request):
@@ -155,7 +153,7 @@ def freeTrial(request):
                             'bookedAt': booked_at
                         })
                     else:
-                        return JsonResponse({'Error': 'bookedAt not found in document'}, status=400)
+                        return JsonResponse({'Error': 'bookedAt not found in document'}, status=nSuccessCodes.NOT_FOUND)
 
                 #logging.info("Both IDs are there")
                 user_ref = db.collection(COLLECTIONS.USER).document(user_id)
@@ -200,58 +198,127 @@ def freeTrial(request):
         return JsonResponse("This is the free trial endpoint. Send a POST request to start the free trial.",safe=False)
 
 @api_view(['POST'])
-def bookSlot(request):
-    entity_type = request.POST.get('entity_type')
-    entity_id = request.POST.get('entity_id')
-    studio_id = request.POST.get('studio_id')
-    user_id = request.POST.get('user_id')
-    final_price = request.POST.get('final_price',0)
-    already_paid = request.POST.get('already_paid',0)
+@csrf_exempt
+def bookEntity(request):
+    logging.info("Book entity")
+    db = FIREBASE_DB
+    entity_type = entity_id= associated_studio_id=  email_learner=persons_allowed= price_per_person= timestamp= user_id = ""
+    logging.info(json.loads(request.body.decode('utf-8')))
+    if request.method == 'POST':
+        try:
+            request_data = json.loads(request.body.decode('utf-8'))
+            user_id = request_data.get('userId')
+            entity_type = request_data.get('entityType')
+            entity_id = request_data.get('entityId')
+            associated_studio_id = request_data.get('associatedStudioId')
+            email_learner = request_data.get('emailLearner')
+            persons_allowed = request_data.get('personsAllowed')
+            price_per_person = request_data.get('pricePerPerson')
 
-    if not user_id or not studio_id or not entity_type or not entity_id:
-        return JsonResponse("Missing one or more parameter")
+            if not is_valid_entity_type(entity_type):
+                JsonResponse({'Error': 'Entity Type not found.'}, status=nSuccessCodes.NOT_FOUND)
 
-    if float(final_price) != 0.0 and (float(final_price) - float(already_paid))>0:
-        msg = f'{(float(final_price) - float(already_paid))} amount to be paid at venue.'
-    elif float(final_price) == 0.0:
-        msg = "Free !"
-    else:
-        msg = "Already paid. No further payment required."
+            bookings_ref = db.collection(COLLECTIONS.BOOKINGS)
+            validation_query_results =   bookings_ref.where(
+                    filter=FieldFilter("user_id", "==", user_id)
+                    ).where(filter=FieldFilter("entity_id", "==", entity_id)
+                    ).stream()
 
-    timestamp = times_gmt()
-    bookings_data = {
-        'entity_type':entity_type,
-        'entity_id': entity_id,
-        'studio_id': studio_id,
-        'user_id': user_id,
-        'final_price': final_price,
-        'already_paid': already_paid,
-        'msg': msg
-    }
-    _ , result_ref = FIREBASE_DB.collection(COLLECTIONS.BOOKINGS).add(bookings_data)
-    if(result_ref.id):
-        return JsonResponse(f"Booked Successfully {result_ref.id}")
-    else:
-        return JsonResponse("Not booked.")
+            first_document = None
+            for doc in validation_query_results:
+                first_document = doc.to_dict()
+                first_document["id"] = doc.id
+                break
+            if first_document:
+                booked_at = first_document.get('timestamp', None)  
+                if booked_at is not None:
+                    return JsonResponse({
+                        'Booking Id': first_document['id'],
+                        'nSuccessCode': nSuccessCodes.ALREADY_BOOKED,
+                        'bookedAt': booked_at
+                    })
+                else:
+                    return JsonResponse({'Error': 'bookedAt not found in document'}, status=nSuccessCodes.NOT_FOUND)
+     
+            timestamp = time.time()
+            new_booking = {
+                'user_id': user_id,
+                'entity_type': entity_type,
+                'entity_id': entity_id,
+                'associated_studio_id': associated_studio_id,
+                'email_learner': email_learner,
+                'persons_allowed': persons_allowed,
+                'price_per_person': price_per_person,
+                'timestamp': timestamp
+            }
+            ticket_id = RedisClient.get_next_ticket_id()
+            bookings_ref.document(ticket_id).set(new_booking)
+
+            return JsonResponse({
+                'nSuccessCode': nSuccessCodes.BOOKING_SUCCESS,
+                'message': 'Booking added successfully'
+            })
+
+        except Exception as e:
+            logging.error(f"Error booking entity: {str(e)}")
+            return JsonResponse({'Error': str(e)}, status= nSuccessCodes.INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
-def getUserBookings(request):
-    logging.info("getUserBookings")
-    user_id = request.GET.get('user_id')
+@csrf_exempt
+async def getUserBookings(request):
+    logging.info("Get entity bookings")
 
-    if not user_id:
-        return JsonResponse({"error": "Missing user_id parameter"}, status=400)
+    if request.method == 'GET':
+        try:
+            db = FIREBASE_DB_ASYNC
+            request_data = json.loads(request.body.decode('utf-8'))
+            user_id = request_data.get('userId')
+            months = 1
 
-    if not user_id :
-        return JsonResponse("Missing one or more parameter")
+            time_filter = time.time() - months * 30 * 24 * 60 * 60  # Past 30 days (optional)
 
-    docs = (FIREBASE_DB.collection(COLLECTIONS.BOOKINGS).where(
-                filter=FieldFilter('UserId',"==",user_id)).stream())
-    if(docs):
-        result = []
-        for doc in docs:
-            result.append(doc.to_dict())
-        logging.info(result)
-        return JsonResponse(result, safe=False,status=200)
-    else:
-        return JsonResponse({"error": str(e)}, status=500)
+            # Define async fetch functions
+            async def fetch_bookings(collection):
+                query_results = await collection.where("user_id", "==", user_id).where("timestamp", ">", time_filter).stream()
+                return [doc.to_dict() for doc in query_results]
+
+            # Fetch bookings concurrently
+            bookings_ref = FIREBASE_DB.collection(COLLECTIONS.BOOKINGS)
+            free_trial_bookings_ref = FIREBASE_DB.collection(COLLECTIONS.FREE_TRIAL_BOOKINGS)
+
+            # Create tasks for concurrent fetching
+            tasks = [
+                fetch_bookings(bookings_ref),
+                fetch_bookings(free_trial_bookings_ref)
+            ]
+
+            # Wait for all tasks to complete
+            results = await asyncio.gather(*tasks)
+
+            categorized_bookings = {
+                COLLECTIONS.FREE_TRIAL_BOOKINGS: results[1],  # Free trial bookings
+                COLLECTIONS.WORKSHOPS: [],
+                COLLECTIONS.OPEN_CLASSES: [],
+                COLLECTIONS.COURSES: []
+            }
+
+            for booking_data in results[0]:  # Main bookings
+                booking_data["id"] = booking_data.id
+                entity_name = booking_data.get('entity_name', '').lower()
+
+                if COLLECTIONS.WORKSHOPS in entity_name:
+                    categorized_bookings[COLLECTIONS.WORKSHOPS].append(booking_data)
+                elif COLLECTIONS.OPEN_CLASSES in entity_name:
+                    categorized_bookings[COLLECTIONS.OPEN_CLASSES].append(booking_data)
+                elif COLLECTIONS.COURSES in entity_name:
+                    categorized_bookings[COLLECTIONS.COURSES].append(booking_data)
+
+            return JsonResponse({
+                'nSuccessCode': nSuccessCodes.SUCCESS,
+                'message': 'Bookings retrieved successfully',
+                'data': categorized_bookings
+            })
+
+        except Exception as e:
+            logging.error(f"Error getting bookings: {str(e)}")
+            return JsonResponse({'Error': str(e)}, status=nSuccessCodes.INTERNAL_SERVER_ERROR)

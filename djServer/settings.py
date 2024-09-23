@@ -32,6 +32,16 @@ ALLOWED_HOSTS = ['127.0.0.1','.herokuapp.com','localhost','nrityaserver-2b241e0a
 CORS_ALLOW_ALL_HEADERS = True
 CORS_ALLOW_ALL_METHODS = True
 
+# Redis connection details
+REDIS_HOST = 'redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com'
+REDIS_PORT = 11857
+REDIS_USERNAME = 'default'  # Use the correct Redis user
+REDIS_PASSWORD = 'Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi'  # Use your Redis password
+
+# You can also define other Redis-related configurations
+REDIS_DB = 0  # Optional, use the default Redis database
+REDIS_MAX_CONNECTIONS = 30  # Adjust this according to your application needs
+
 SETUP = "HEROKU" #"LOCAL" #"HEROKU"
 # Application definition
 
