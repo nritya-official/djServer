@@ -275,6 +275,13 @@ def getUserBookings(request, user_id):
 
             time_filter = time.time() - months * 30 * 24 * 60 * 60  # Past 30 days (optional)
 
+            def get_name(collection_name, doc_id):
+                doc_ref = FIREBASE_DB.collection(collection_name).document(doc_id)
+                doc = doc_ref.get()
+                if doc.exists:
+                    mp = doc.to_dict()
+                    return (mp.get("workshopName") or mp.get("studioName") or mp.get("openClassName") or mp.get("studioName"))
+
             # Define sync fetch function
             def fetch_bookings(collection):
                 docs = collection.where(filter=FieldFilter("user_id", "==", user_id)).where(filter=FieldFilter("timestamp", ">", time_filter)).stream()
@@ -295,7 +302,6 @@ def getUserBookings(request, user_id):
 
             bookings_ref = FIREBASE_DB.collection(COLLECTIONS.BOOKINGS)
             free_trial_bookings_ref = FIREBASE_DB.collection(COLLECTIONS.FREE_TRIAL_BOOKINGS)
-            
 
             bookings_results = fetch_bookings(bookings_ref)
             free_trial_results = fetch_bookings(free_trial_bookings_ref)
@@ -309,13 +315,20 @@ def getUserBookings(request, user_id):
             logging.info(bookings_results)
             for booking_id, booking_data in bookings_results.items():
                 entity_type = booking_data['entity_type']
-                
+                entity_id = booking_data['entity_id']
+                associated_studio_id = booking_data['associated_studio_id']
                 # Categorize based on entity_type
                 if entity_type == 'Workshops':
+                    booking_data["entity_name"] = get_name(COLLECTIONS.WORKSHOPS,entity_id)
+                    booking_data["studio_name"] = get_name(COLLECTIONS.STUDIO,associated_studio_id)
                     categorized_bookings[COLLECTIONS.WORKSHOPS][booking_id] = booking_data
                 elif entity_type == 'OpenClasses':
+                    booking_data["entity_name"] = get_name(COLLECTIONS.OPEN_CLASSES,entity_id)
+                    booking_data["studio_name"] = get_name(COLLECTIONS.STUDIO,associated_studio_id)
                     categorized_bookings[COLLECTIONS.OPEN_CLASSES][booking_id] = booking_data
                 elif entity_type == 'Courses':
+                    booking_data["entity_name"] = get_name(COLLECTIONS.COURSES,entity_id)
+                    booking_data["studio_name"] = get_name(COLLECTIONS.STUDIO,associated_studio_id)
                     categorized_bookings[COLLECTIONS.COURSES][booking_id] = booking_data
 
                     # Optionally handle unexpected entity types if necessary
