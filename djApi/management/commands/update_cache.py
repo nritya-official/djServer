@@ -92,12 +92,34 @@ def process_collection(collection_name, allowed_fields, rc, db):
 
     for doc in docs:
         data = {}
+        min_fee = float('inf')  # Set min_fee to a large value initially
+        free_trial_available = False  # Initialize freeTrialAvailable as False
+        
         for field, value in doc.to_dict().items():
             if field in allowed_fields:
                 if isinstance(value, firebase_admin.firestore.DocumentReference):
                     data[field] = value.id
                 else:
                     data[field] = value
+
+            if collection_name == COLLECTIONS.STUDIO and field == 'tableData':
+                table_data = value  
+
+                for key, class_data in table_data.items():
+                    fee_value = class_data.get('fee')
+                    if fee_value and fee_value.isdigit():
+                        fee = int(fee_value)
+                        if fee < min_fee:
+                            min_fee = fee
+
+                    if class_data.get('freeTrial', False):
+                        free_trial_available = True
+
+        if collection_name == COLLECTIONS.STUDIO:
+            data['minFee'] = min_fee if min_fee != float('inf') else None
+            data['freeTrialAvailable'] = free_trial_available
+
+
         data["id"] = doc.id  # Use a common key for document ID
         path = f"{collection_icon[collection_name]}/{doc.id}/"
         blobs = STORAGE_BUCKET.list_blobs(prefix=path, delimiter="/")
@@ -107,7 +129,8 @@ def process_collection(collection_name, allowed_fields, rc, db):
             for blob in blobs:
                 signed_url = blob.generate_signed_url(datetime.timedelta(seconds=800), method='GET')
                 signed_urls.append(signed_url)
-        
+        if collection_name == COLLECTIONS.STUDIO:
+            print(data)
         if signed_urls:
             data["iconUrl"] = signed_urls[0]
         else:
@@ -129,8 +152,10 @@ def process_collection(collection_name, allowed_fields, rc, db):
 
     for city, items in data_source.items():
         rc.set(f"{city.lower()}-{collection_name}", json.dumps(items))
+    logging.info("======MAIN=========")
     logging.info(collection_name.lower())
     logging.info(city_item_names)
+    logging.info("=====LITE=======")
     for city, item_names in city_item_names.items():
         logging.info(f"{city.lower()}-{collection_name}-Lite")
         logging.info(item_names)
@@ -140,3 +165,4 @@ def process_collection(collection_name, allowed_fields, rc, db):
     rc.set(f"last_updated_{collection_name.lower()}", last_updated_time)
     
     logging.info(f"Cache for collection {collection_name} updated successfully.")
+
