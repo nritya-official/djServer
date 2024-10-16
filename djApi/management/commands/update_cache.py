@@ -14,10 +14,10 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 collection_fields = {
-    COLLECTIONS.STUDIO : ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId', 'geolocation', 'street'],
-    COLLECTIONS.WORKSHOPS : ['city', 'workshopName', 'time', 'date', 'level', 'danceStyles','StudioId','price'],
-    COLLECTIONS.OPENCLASSES : ['city', 'date', 'active', 'danceStyles', 'level', 'time', 'venue', 'openClassName','StudioId','price'],
-    COLLECTIONS.COURSES : ['city', 'date', 'level', 'workshopName','courseName','venue', 'time', 'danceStyles','StudioId','price']
+    COLLECTIONS.STUDIO : ['city', 'avgRating', 'status', 'isPremium', 'danceStyles', 'state', 'studioName', 'UserId', 'geolocation', 'street','youtubeViedoLink'],
+    COLLECTIONS.WORKSHOPS : ['city', 'workshopName', 'time', 'date', 'level', 'danceStyles','StudioId','price','youtubeViedoLink'],
+    COLLECTIONS.OPENCLASSES : ['city', 'date', 'active', 'danceStyles', 'level', 'time', 'venue', 'openClassName','StudioId','price','youtubeViedoLink'],
+    COLLECTIONS.COURSES : ['city', 'date', 'level', 'workshopName','courseName','venue', 'time', 'danceStyles','StudioId','price','youtubeViedoLink']
 }
 
 collection_icon ={
@@ -152,10 +152,7 @@ def process_collection(collection_name, allowed_fields, rc, db):
 
     for city, items in data_source.items():
         rc.set(f"{city.lower()}-{collection_name}", json.dumps(items))
-    logging.info("======MAIN=========")
-    logging.info(collection_name.lower())
-    logging.info(city_item_names)
-    logging.info("=====LITE=======")
+
     for city, item_names in city_item_names.items():
         logging.info(f"{city.lower()}-{collection_name}-Lite")
         logging.info(item_names)
