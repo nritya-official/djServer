@@ -24,10 +24,10 @@ def crudTest(request):
 
 def send_notification_emails(collection_name, emails, operation_type, entity_id):
     task = {
-        collection_name : collection_name,
-        emails : emails,
-        operation_type : operation_type,
-        entity_id : entity_id
+        "collection_name" : collection_name,
+        "emails" : emails,
+        "operation_type" : operation_type,
+        "entity_id" : entity_id
     }
     CELERY_APP.send_task('tasks.process_email_task', args=[task])
 
