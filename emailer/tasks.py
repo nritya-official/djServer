@@ -1,12 +1,18 @@
 import os
 from celery import Celery
-from django.conf import settings
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Celery('tasks', broker=settings.CELERY_BROKER_URL)
+REDIS_HOST = 'redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com'
+REDIS_PORT = 11857
+REDIS_USERNAME = 'default'  # Use the correct Redis user
+REDIS_PASSWORD = 'Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi'  # Use your Redis password
+
+CELERY_BROKER_URL = f'redis://{REDIS_USERNAME}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0'
+
+app = Celery('tasks', broker=CELERY_BROKER_URL)
 
 app.conf.update(
     task_serializer='json',
