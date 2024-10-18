@@ -24,6 +24,7 @@ def crudTest(request):
 
 def send_notification_emails(collection_name, emails, operation_type, entity_id):
     task = {
+        "type" : NOTIFICATION.TYPE_CRUD ,
         "collection_name" : collection_name,
         "emails" : emails,
         "operation_type" : operation_type,

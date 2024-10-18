@@ -43,6 +43,7 @@ class NOTIFICATION:
     OP_KYC_APPROVED = "creator approved" 
     OP_KYC_REJECTED = "creator rejected"
     OP_KYC_REVOKED = "creator revoked"
+    TYPE_CRUD = "Crud"
 
 class nSuccessCodes:
     CREATED = 201
