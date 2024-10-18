@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-60!b4c079)cctw&)!=+7!0acnx6*euwi_gk3g6h)rkt(p0gt*+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True #False
 
-ALLOWED_HOSTS = ['127.0.0.1','.herokuapp.com','localhost','nrityaserver-2b241e0a97e5.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1','.herokuapp.com','localhost','nrityaserver-2b241e0a97e5.herokuapp.com','*']
 CORS_ALLOW_ALL_HEADERS = True
 CORS_ALLOW_ALL_METHODS = True
 
@@ -37,6 +37,8 @@ REDIS_HOST = 'redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com'
 REDIS_PORT = 11857
 REDIS_USERNAME = 'default'  # Use the correct Redis user
 REDIS_PASSWORD = 'Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi'  # Use your Redis password
+
+CELERY_BROKER_URL = f'redis://{REDIS_USERNAME}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0'
 
 # You can also define other Redis-related configurations
 REDIS_DB = 0  # Optional, use the default Redis database
@@ -59,6 +61,7 @@ INSTALLED_APPS = [
     'payments',
     'reports',
     'djSms',
+    'djCrud',
     'rest_framework_swagger',
     'rest_framework',
 ]
