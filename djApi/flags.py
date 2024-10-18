@@ -1,6 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials, firestore, firestore_async,storage, auth
 from celery import Celery
+from django.conf import settings
 
 CACHE_UPDATE_INTERVAL = 600
 FIREBASE_CREDENTIALS = credentials.Certificate('djApi/config.json')
@@ -59,4 +60,4 @@ def init_firebase():
     FIREBASE_AUTH = auth
 
     global CELERY_APP
-    CELERY_APP =  Celery('tasks', broker= CELERY_BROKER_URL)
+    CELERY_APP =  Celery('tasks', broker= settings.CELERY_BROKER_URL)
