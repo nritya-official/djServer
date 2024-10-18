@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt  
-from djApi.flags import FIREBASE_DB, COLLECTIONS, nSuccessCodes, CELERY_APP
+from djApi.flags import FIREBASE_DB, COLLECTIONS, nSuccessCodes, CELERY_APP, NOTIFICATION
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
 import json
 import logging
@@ -45,7 +45,7 @@ def newEntity(request):
             update_time, collection_ref = collection_ref.add(data)
 
             if emails:
-                send_notification_emails(collection_name, emails, operation_type)
+                send_notification_emails(collection_name, emails, NOTIFICATION.OP_CREATE, collection_ref.id)
                 logger.info(collection_ref.id)
             return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=201)
 
