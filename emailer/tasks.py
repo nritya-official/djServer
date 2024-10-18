@@ -18,7 +18,7 @@ app.conf.update(
 
 @app.task(name='tasks.process_email_task')
 def process_email_task(email_data):
-    logger.info(f"Processing email to: {email_data['email']}, Subject: {email_data['subject']}")
+    logger.info(f"Processing email to: {email_data['email']}, collection_name: {email_data['collection_name']}, operation_type: {email_data['operation_type']}, entity_id: {email_data['entity_id']}")
     # Simulate email sending (replace with actual email sending logic)
     # send_email(email_data['email'], email_data['subject'], email_data['body'])
 
