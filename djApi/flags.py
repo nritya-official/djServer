@@ -8,6 +8,7 @@ FIREBASE_APP = None
 FIREBASE_DB = None
 STORAGE_BUCKET =  None
 FIREBASE_AUTH = None
+CELERY_APP = None
 
 class COLLECTIONS:
     USER = 'User'
@@ -56,3 +57,6 @@ def init_firebase():
 
     global FIREBASE_AUTH
     FIREBASE_AUTH = auth
+
+    global CELERY_APP
+    CELERY_APP =  Celery('tasks', broker= CELERY_BROKER_URL)

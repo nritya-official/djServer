@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt  
-from djApi.flags import FIREBASE_DB, COLLECTIONS, nSuccessCodes
+from djApi.flags import FIREBASE_DB, COLLECTIONS, nSuccessCodes, CELERY_APP
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
 import json
 import logging
@@ -22,6 +22,15 @@ def crudTest(request):
     logging.info("Hello")
     return JsonResponse({'message': 'This is the crud endpoint.'})
 
+def send_notification_emails(collection_name, emails, operation_type, entity_id):
+    task = {
+        collection_name : collection_name,
+        emails : emails,
+        operation_type : operation_type,
+        entity_id : entity_id
+    }
+    CELERY_APP.send_task('tasks.process_email_task', args=[task])
+
 @csrf_exempt
 def newEntity(request):
     if request.method == 'POST':
@@ -36,7 +45,7 @@ def newEntity(request):
             update_time, collection_ref = collection_ref.add(data)
 
             if emails:
-                #send_notification_emails(collection_name, emails, operation_type)
+                send_notification_emails(collection_name, emails, operation_type)
                 logger.info(collection_ref.id)
             return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=201)
 

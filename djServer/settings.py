@@ -38,6 +38,8 @@ REDIS_PORT = 11857
 REDIS_USERNAME = 'default'  # Use the correct Redis user
 REDIS_PASSWORD = 'Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi'  # Use your Redis password
 
+CELERY_BROKER_URL = f'redis://{REDIS_USERNAME}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0'
+
 # You can also define other Redis-related configurations
 REDIS_DB = 0  # Optional, use the default Redis database
 REDIS_MAX_CONNECTIONS = 30  # Adjust this according to your application needs
