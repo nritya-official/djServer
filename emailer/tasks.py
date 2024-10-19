@@ -73,6 +73,7 @@ def load_html_template(title, body, url):
         current_dir = os.path.dirname(os.path.abspath(__file__)) 
         template_dir = os.path.join(current_dir, 'templates')
         logger.info(f"Loading templates from directory: {template_dir}")
+        logger.info(f"title : {title},body: {body},url: {url}")
         env = Environment(loader=FileSystemLoader(template_dir))
         template = env.get_template('new-email.html')
         html_content = template.render(title=title, body=body, url=url )
