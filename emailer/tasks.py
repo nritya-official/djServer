@@ -25,7 +25,7 @@ app.conf.update(
 @app.task(name='tasks.process_email_task')
 def process_email_task(email_data):
     if email_data['type'] == NOTIFICATION.TYPE_CRUD:
-        logger.info(f"Processing email to: {email_data['emails']}, collection_name: {email_data['collection_name']}, operation_type: {email_data['operation_type']}, entity_id: {email_data['entity_id']}")
+        logger.info(f"Processing email to: {email_data['emails']}, collection_name: {email_data['collection_name']}, operation_type: {email_data['operation_type']}, entity_id: {email_data['entity_id']},  metadata: {email_data['metadata']}")
     # Simulate email sending (replace with actual email sending logic)
     # send_email(email_data['email'], email_data['subject'], email_data['body'])
 
