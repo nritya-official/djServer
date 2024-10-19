@@ -21,7 +21,7 @@ class STORAGE_FOLDER:
     STUDIO_ICON = 'StudioIcon'
 
 class NOTIFICATION:
-    OP_CREATE = "created"
+    OP_CREATE = "added"
     OP_UPDATE = "updated"
     OP_DELETE = "deleted"
     OP_SIGN_UP = "Sign Up"
