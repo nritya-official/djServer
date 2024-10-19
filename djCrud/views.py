@@ -22,7 +22,7 @@ def crudTest(request):
     logging.info("Hello")
     return JsonResponse({'message': 'This is the crud endpoint.'})
 
-def send_notification_emails(collection_name, emails, operation_type, entity_id):
+def send_notification_emails(collection_name, emails, operation_type, entity_id, metadata):
     task = {
         "type" : NOTIFICATION.TYPE_CRUD ,
         "collection_name" : collection_name,
