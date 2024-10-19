@@ -28,7 +28,8 @@ def send_notification_emails(collection_name, emails, operation_type, entity_id)
         "collection_name" : collection_name,
         "emails" : emails,
         "operation_type" : operation_type,
-        "entity_id" : entity_id
+        "entity_id" : entity_id,
+        "metadata" : metadata
     }
     CELERY_APP.send_task('tasks.process_email_task', args=[task])
 
@@ -40,13 +41,13 @@ def newEntity(request):
             data = body.get('data')
             collection_name = body.get('collection_name')
             emails = body.get('notify', '')
-
+            metadata = body.get('metadata', '')
             # Add the document to Firestore
             collection_ref = FIREBASE_DB.collection(collection_name)
             update_time, collection_ref = collection_ref.add(data)
 
             if emails:
-                send_notification_emails(collection_name, emails, NOTIFICATION.OP_CREATE, collection_ref.id)
+                send_notification_emails(collection_name, emails, NOTIFICATION.OP_CREATE, collection_ref.id, metadata)
                 logger.info(collection_ref.id)
             return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=201)
 
