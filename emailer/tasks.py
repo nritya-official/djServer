@@ -6,6 +6,8 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from jinja2 import Environment, FileSystemLoader, Template
+from django.template.loader import get_template
+from django.conf import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -69,9 +71,9 @@ def generate_tbus(email_data):
 
 def load_html_template(title, body, url):
     try:
-        env = Environment(loader=FileSystemLoader('templates'))
-        print(env)
-        template = env.get_template('new-email.html')
+        #env = Environment(loader=FileSystemLoader('templates'))
+        #template = env.get_template('new-email.html')
+        template = get_template('new-email.html')
         html_content = template.render(title=title, body=body, url=url )
         return html_content
     except Exception as e:
@@ -97,10 +99,10 @@ def send_gmail_email(receiver_email, title, body, url, subject ):
         server.starttls() 
         server.login(sender_email, app_password)
         server.sendmail(sender_email, receiver_email, msg.as_string())
-        print('Email sent successfully!')
+        logger.info('Email sent successfully!')
 
     except Exception as e:
-        print(f'Failed to send email. Error: {str(e)}')
+        logger.info(f'Failed to send email. Error: {str(e)}')
 
     finally:
         server.quit()
