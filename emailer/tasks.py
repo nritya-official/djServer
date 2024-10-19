@@ -6,11 +6,10 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from jinja2 import Environment, FileSystemLoader, Template
-from django.template.loader import get_template
-from django.conf import settings
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
+logger = logging.getLogger("Celery")
 
 REDIS_HOST = 'redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com'
 REDIS_PORT = 11857
@@ -71,9 +70,11 @@ def generate_tbus(email_data):
 
 def load_html_template(title, body, url):
     try:
-        #env = Environment(loader=FileSystemLoader('templates'))
-        #template = env.get_template('new-email.html')
-        template = get_template('new-email.html')
+        current_dir = os.path.dirname(os.path.abspath(__file__)) 
+        template_dir = os.path.join(current_dir, 'templates')
+        logger.info(f"Loading templates from directory: {template_dir}")
+        env = Environment(loader=FileSystemLoader(template_dir))
+        template = env.get_template('new-email.html')
         html_content = template.render(title=title, body=body, url=url )
         return html_content
     except Exception as e:
