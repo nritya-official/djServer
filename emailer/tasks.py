@@ -63,7 +63,7 @@ def generate_tbus(email_data):
         url = f"https://nritya-official.github.io/nritya-webApp/#/workshop/{entity_id}"
     elif collection_name == COLLECTIONS.COURSES:
         url = f"https://nritya-official.github.io/nritya-webApp/#/course/{entity_id}"
-    elif collection_name == COLLECTIONS.COURSES:
+    elif collection_name == COLLECTIONS.OPENCLASSES:
         url = f"https://nritya-official.github.io/nritya-webApp/#/openClass/{entity_id}"
 
     return title, body, url, subject
