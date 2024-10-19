@@ -1,15 +1,34 @@
 import time
+import jwt
 
 class COLLECTIONS:
     USER = 'User'
     STUDIO = 'Studio'
-    OPEN_CLASSES = 'OpenClasses'
-    WORKSHOPS = 'Workshops'
     COURSES = 'Courses'
+    OPENCLASSES = 'OpenClasses'
+    WORKSHOPS = 'Workshops'
+    BOOKINGS = 'Bookings'
     RATINGS = 'Ratings'
+    USER_KYC = 'UserKyc'
+    TRANSACTIONS = 'Transactions'
     FREE_TRIAL_BOOKINGS = 'FreeTrialBookings'
     INSTRUCTORS = 'Instructors'
-    BOOKINGS = 'Bookings'
+
+
+class STORAGE_FOLDER:
+    STUDIO_IMAGES = 'StudioImages'
+    STUDIO_ANNOUNCEMENTS = 'StudioAnnouncements'
+    STUDIO_ICON = 'StudioIcon'
+
+class NOTIFICATION:
+    OP_CREATE = "created"
+    OP_UPDATE = "updated"
+    OP_DELETE = "deleted"
+    OP_SIGN_UP = "Sign Up"
+    OP_KYC_APPROVED = "creator approved" 
+    OP_KYC_REJECTED = "creator rejected"
+    OP_KYC_REVOKED = "creator revoked"
+    TYPE_CRUD = "Crud"
 
 class nSuccessCodes:
     # Success Codes
@@ -57,3 +76,37 @@ def get_reversed_dictionary(input_dict):
   if len(reversed_dict) != len(input_dict):
     raise TypeError("The values in the dictionary are not unique")
   return reversed_dict
+
+def extract_user_id(request):
+    """
+    Utility function to extract user_id from the Authorization header in the request
+    without verifying the token signature.
+    
+    Args:
+        request: The incoming Django request object.
+    
+    Returns:
+        str: The user ID extracted from the JWT token, or an error message as a string.
+    """
+    # Get the Authorization header
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return 'Authorization header missing'
+
+    # Extract the token from the 'Bearer <token>' format
+    if auth_header.startswith('Bearer '):
+        auth_token = auth_header.split(' ')[1]
+    else:
+        return 'Invalid Authorization header format'
+
+    # Decode the JWT without verifying the signature
+    try:
+        decoded_token = jwt.decode(auth_token, options={"verify_signature": False})
+        user_id = decoded_token.get('user_id')  # Assuming 'user_id' is stored in the token
+        return user_id
+    except jwt.ExpiredSignatureError:
+        return 'Token has expired'
+    except jwt.InvalidTokenError:
+        return 'Invalid token'
+

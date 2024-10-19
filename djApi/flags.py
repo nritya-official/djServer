@@ -35,21 +35,9 @@ class STORAGE_FOLDER:
     STUDIO_ANNOUNCEMENTS = 'StudioAnnouncements'
     STUDIO_ICON = 'StudioIcon'
 
-class NOTIFICATION:
-    OP_CREATE = "created"
-    OP_UPDATE = "updated"
-    OP_DELETE = "deleted"
-    OP_SIGN_UP = "Sign Up"
-    OP_KYC_APPROVED = "creator approved" 
-    OP_KYC_REJECTED = "creator rejected"
-    OP_KYC_REVOKED = "creator revoked"
-    TYPE_CRUD = "Crud"
-
 class nSuccessCodes:
     CREATED = 201
     ALREADY_BOOKED = 202
-
-
 
 def init_firebase():
     global FIREBASE_APP
