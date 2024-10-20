@@ -52,7 +52,7 @@ def newEntity(request):
             operation_type, entity_created_key, collection_ref = handle_entity_creation(collection_name, data)
 
             if collection_name == COLLECTIONS.USER:
-                return create_user_entity(collection_name, data)
+                return create_user_entity(collection_name, operation_type, data)
 
             # Process user creation for other entity types
             user_id = extract_user_id(request)
@@ -104,14 +104,21 @@ def handle_entity_creation(collection_name, data):
         entity_created_key = "WorkshopCreated"
     elif collection_name == COLLECTIONS.INSTRUCTORS:
         operation_type = NOTIFICATION.OP_CREATE
+    elif collection_name == COLLECTIONS.USER:
+        operation_type = NOTIFICATION.OP_SIGN_UP
 
     return operation_type, entity_created_key, collection_ref
 
-def create_user_entity(collection_name, data):
+def create_user_entity(collection_name, operation_type, data, metadata = {}):
     """Creates a new user entity and returns the response."""
     collection_ref = FIREBASE_DB.collection(collection_name)
-    update_time, collection_ref = collection_ref.add(data)
-    return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
+    emails = data.get('Email',None)
+    if emails and is_valid_entity_type(collection_name) and collection_ref.id :
+        update_time, collection_ref = collection_ref.add(data)
+        send_notification_emails(collection_name, emails, operation_type , collection_ref.id, metadata)
+        return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
+    else:
+        return JsonResponse({'status': 'success', 'message': 'Failure no proper gmail.'}, status=nSuccessCodes.FAILURE)
 
 def get_user_data(user_id):
     """Retrieves user data from Firebase."""
@@ -127,93 +134,3 @@ def update_user_entity_created(user_ref, entity_created_key, collection_id, user
         entity_created = user_data.get(entity_created_key, [])
         entity_created.append(collection_id)
         user_ref.set({entity_created_key: entity_created}, merge=True)
-
-
-
-
-
-
-
-
-
-
-
-def newEntity2(request):
-    if request.method == 'POST':
-        try:
-            body = json.loads(request.body)
-            data = body.get('data')
-            collection_name = body.get('collection_name')
-            emails = body.get('notify', '')
-            metadata = body.get('metadata', '')
-            operation_type = None
-            entity_created_key = None
-            collection_ref = None
-
-            if not is_valid_entity_type(collection_name):
-                JsonResponse({'Error': 'Entity Type not found.'}, status=nSuccessCodes.NOT_FOUND)
-
-            if collection_name == COLLECTIONS.STUDIO:
-                operation_type = NOTIFICATION.OP_CREATE_STUDIO
-                entity_created_key = "StudioCreated"
-
-            elif collection_name == COLLECTIONS.COURSES:
-                operation_type = NOTIFICATION.OP_CREATE
-                entity_created_key = "CourseCreated"
-
-            elif collection_name == COLLECTIONS.OPENCLASSES:
-                operation_type = NOTIFICATION.OP_CREATE
-                entity_created_key = "OpenClassCreated"
-
-            elif collection_name == COLLECTIONS.WORKSHOPS:
-                operation_type = NOTIFICATION.OP_CREATE
-                entity_created_key = "WorkshopCreated"
-
-            elif collection_name == COLLECTIONS.INSTRUCTORS:
-                operation_type = NOTIFICATION.OP_CREATE
-
-            elif collection_name == COLLECTIONS.USER :
-                operation_type = NOTIFICATION.OP_SIGN_UP
-                collection_ref = FIREBASE_DB.collection(collection_name)
-                update_time, collection_ref = collection_ref.add(data)
-                return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
-
-            # User trying to create some entity
-            if collection_name in [COLLECTIONS.STUDIO, COLLECTIONS.COURSES, COLLECTIONS.OPENCLASSES, COLLECTIONS.WORKSHOPS, COLLECTIONS.INSTRUCTORS]:
-                user_id = extract_user_id(request)
-                # User exists
-                if(user_id):
-                    user_ref = FIREBASE_DB.collection(COLLECTIONS.USER).document(user_id)
-                    user_snap = user_ref.get()
-                    if user_snap.exists:
-                        user_data = user_snap.to_dict() or {}
-                        isCreator = user_data.get(CreatorMode,False)
-                        # User is not a creator
-                        if not isCreator:
-                            return JsonResponse({'status': 'error', 'message': "User not a creator."}, status=nSuccessCodes.FORBIDDEN)
-                        # User is a creator
-                        collection_ref = FIREBASE_DB.collection(collection_name)
-                        update_time, collection_ref = collection_ref.add(data)
-                        # Non instructor entity created
-                        if entity_created_key:
-                            entity_created = user_data.get(entity_created_key, [])
-                            entity_created.append(collection_ref.id)
-                            user_ref.set({entity_created_key: entity_created}, merge=True)
-                    else:
-                        return JsonResponse({'status': 'error', 'message': "User not found."}, status=nSuccessCodes.NOT_FOUND)
-                # User does not exists
-                else:
-                    return JsonResponse({'status': 'error', 'message': "Please log in again."}, status=nSuccessCodes.UNAUTHORIZED)
-
-            
-            if emails and operation_type and collection_name and collection_ref.id:
-                send_notification_emails(collection_name, emails, operation_type, collection_ref.id, metadata)
-                logger.info(collection_ref.id)
-
-            return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
-
-        except Exception as e:
-            logger.error(f"Error occurred: {str(e)}")  
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)

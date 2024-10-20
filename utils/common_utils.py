@@ -46,6 +46,7 @@ class nSuccessCodes:
     NOT_FOUND = 404  # Resource not found
     METHOD_NOT_ALLOWED = 405  # Method not allowed
     CONFLICT = 409  # Conflict with the current state of the resource
+    FAILURE = 420
 
     # Server Error Codes
     INTERNAL_SERVER_ERROR = 500  # Generic server error
