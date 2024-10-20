@@ -53,7 +53,7 @@ def newEntity(request):
             operation_type, entity_created_key, collection_ref = handle_entity_creation(collection_name, data)
 
             if collection_name == COLLECTIONS.USER:
-                return create_user_entity(collection_name, operation_type, data)
+                return create_user_entity(collection_name, operation_type, data, emails)
 
             # Process user creation for other entity types
             user_id = extract_user_id(request)
@@ -110,10 +110,9 @@ def handle_entity_creation(collection_name, data):
 
     return operation_type, entity_created_key, collection_ref
 
-def create_user_entity(collection_name, operation_type, data, metadata = {}):
+def create_user_entity(collection_name, operation_type, data,emails, metadata = {}):
     """Creates a new user entity and returns the response."""
     collection_ref = FIREBASE_DB.collection(collection_name)
-    emails = data.get('Email',None)
     if emails and is_valid_entity_type(collection_name) and collection_ref.id :
         update_time, collection_ref = collection_ref.add(data)
         logger.info(f'create_user_entity collection_name {collection_name}, emails {emails},operation_type {operation_type} ,User Id {collection_ref.id},metadata {metadata}')
