@@ -93,7 +93,7 @@ def send_gmail_email(receiver_email, title, body, url, subject ):
     msg['To'] = receiver_email
     msg['Subject'] = subject
     html_content = load_html_template(title, body, url)
-
+    logger.info(f'title {title}, body {body}, url {url}, subject {subject}')
     msg.attach(MIMEText(html_content, 'html'))
 
     try:
