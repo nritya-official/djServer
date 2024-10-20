@@ -92,7 +92,7 @@ def handle_entity_creation(collection_name, data):
     collection_ref = None
 
     if collection_name == COLLECTIONS.STUDIO:
-        operation_type = NOTIFICATION.OP_CREATE_STUDIO
+        operation_type = NOTIFICATION.OP_CREATE
         entity_created_key = "StudioCreated"
     elif collection_name == COLLECTIONS.COURSES:
         operation_type = NOTIFICATION.OP_CREATE
