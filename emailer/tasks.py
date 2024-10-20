@@ -101,7 +101,7 @@ def send_gmail_email(receiver_email, title, body, url, subject ):
         server.starttls() 
         server.login(sender_email, app_password)
         server.sendmail(sender_email, receiver_email, msg.as_string())
-        logger.info('Email sent successfully!')
+        logger.info(f'Email sent successfully from {sender_email} to {receiver_email}')
 
     except Exception as e:
         logger.info(f'Failed to send email. Error: {str(e)}')
