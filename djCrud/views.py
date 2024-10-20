@@ -115,6 +115,7 @@ def create_user_entity(collection_name, operation_type, data, metadata = {}):
     emails = data.get('Email',None)
     if emails and is_valid_entity_type(collection_name) and collection_ref.id :
         update_time, collection_ref = collection_ref.add(data)
+        logger.info(f'collection_name {collection_name}, emails {emails},operation_type {operation_type} ,User Id {collection_ref.id},metadata {metadata}')
         send_notification_emails(collection_name, emails, operation_type , collection_ref.id, metadata)
         return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
     else:
