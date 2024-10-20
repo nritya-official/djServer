@@ -53,7 +53,7 @@ def newEntity(request):
             operation_type, entity_created_key, collection_ref = handle_entity_creation(collection_name, data)
 
             if collection_name == COLLECTIONS.USER:
-                return create_user_entity(collection_name, operation_type, data, emails)
+                return create_user_entity(collection_name, operation_type, data, emails, metadata)
 
             # Process user creation for other entity types
             user_id = extract_user_id(request)
@@ -110,12 +110,13 @@ def handle_entity_creation(collection_name, data):
 
     return operation_type, entity_created_key, collection_ref
 
-def create_user_entity(collection_name, operation_type, data,emails, metadata = {}):
+def create_user_entity(collection_name, operation_type, data, emails, metadata):
     """Creates a new user entity and returns the response."""
-    collection_ref = FIREBASE_DB.collection(collection_name)
-    if emails and is_valid_entity_type(collection_name) and collection_ref.id :
-        update_time, collection_ref = collection_ref.add(data)
-        logger.info(f'create_user_entity collection_name {collection_name}, emails {emails},operation_type {operation_type} ,User Id {collection_ref.id},metadata {metadata}')
+    user_id = metadata.get('user_id',None)
+    collection_ref = FIREBASE_DB.collection(collection_name).document(user_id)
+    if emails and is_valid_entity_type(collection_name) and collection_ref and user_id:
+        collection_ref.set(data)
+        logger.info(f'create_user_entity collection_name {collection_name}, emails {emails},operation_type {operation_type} ,User Id {user_id},metadata {metadata}')
         send_notification_emails(collection_name, emails, operation_type , collection_ref.id, metadata)
         return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
     else:
