@@ -252,16 +252,26 @@ def search(request):
 
 @api_view(['GET'])
 def autocomplete(request):
-    #studio_name_query = request.GET.get('query', '').lower()
     city = request.GET.get('city', '').lower()
     entity = request.GET.get("entity", COLLECTIONS.STUDIO)
-    key = city.lower()+"-"+entity+'-'+"Lite"
-    studio_names_json = rc.get(key)
-    logging.info(studio_names_json)
-    if studio_names_json:
-        return JsonResponse(json.loads(studio_names_json),safe=False)
-    else:
-        return JsonResponse([])
+
+    # Construct the hash key for the city and entity type.
+    key = f"{city}-{entity}-Lite"
+    logging.info(f"Fetching autocomplete suggestions for key: {key}")
+
+    # Get all the names from the Redis hash.
+    try:
+        studio_names = rc.hgetall(key)  # Retrieves all entries in the hash as a dictionary
+        if studio_names:
+            # Return the list of names directly
+            return JsonResponse(list(studio_names.values()), safe=False)
+        else:
+            logging.info("No data found in Redis cache for this key.")
+            return JsonResponse([], safe=False)
+    except Exception as e:
+        logging.error(f"Error retrieving autocomplete suggestions: {e}")
+        return JsonResponse({"error": "Internal Server Error"}, status=500)
+
 
 
 
