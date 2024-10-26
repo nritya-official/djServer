@@ -249,7 +249,6 @@ def search(request):
         logging.error("Error searching: {}".format(e))
         return JsonResponse({"error": "Internal Server Error"}, status=500)
 
-
 @api_view(['GET'])
 def autocomplete(request):
     city = request.GET.get('city', '').lower()
@@ -259,21 +258,21 @@ def autocomplete(request):
     key = f"{city}-{entity}-Lite"
     logging.info(f"Fetching autocomplete suggestions for key: {key}")
 
-    # Get all the names from the Redis hash.
     try:
+        # Get all entries from the Redis hash and decode bytes to strings for both keys and values
         studio_names = rc.hgetall(key)  # Retrieves all entries in the hash as a dictionary
         if studio_names:
-            # Return the list of names directly
-            return JsonResponse(list(studio_names.values()), safe=False)
+            # Decode each key-value pair and construct the result dictionary
+            studio_names_dict = {
+                studio_id.decode('utf-8'): name.decode('utf-8') for studio_id, name in studio_names.items()
+            }
+            return JsonResponse(studio_names_dict, safe=False)
         else:
             logging.info("No data found in Redis cache for this key.")
-            return JsonResponse([], safe=False)
+            return JsonResponse({}, safe=False)
     except Exception as e:
         logging.error(f"Error retrieving autocomplete suggestions: {e}")
         return JsonResponse({"error": "Internal Server Error"}, status=500)
-
-
-
 
 def help(request):
     endpoint_map = {
