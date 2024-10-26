@@ -129,7 +129,8 @@ def process_collection(collection_name, allowed_fields, rc, db):
             for blob in blobs:
                 signed_url = blob.generate_signed_url(datetime.timedelta(seconds=800), method='GET')
                 signed_urls.append(signed_url)
-        
+        if collection_name == COLLECTIONS.STUDIO:
+            print(data)
         if signed_urls:
             data["iconUrl"] = signed_urls[0]
         else:
@@ -138,28 +139,27 @@ def process_collection(collection_name, allowed_fields, rc, db):
         city = data.get("city", "")
         if city:
             if city not in data_source:
-                data_source[city] = {}
-            data_source[city][data["id"]] = data  # Store data with entity ID as the key
+                #data_source[city] = []
+                data_source[city] = {None:None}
+            #data_source[city].append(data)
+            data_source[city][data["id"]] = data
 
             item_name = data.get(collection_name_field[collection_name], "")
             if item_name:
                 if city not in city_item_names:
-                    city_item_names[city] = {}
+                    city_item_names[city] = {None:None}
                 city_item_names[city][data["id"]] = item_name 
 
-    # Save data as hashes in Redis
     for city, items in data_source.items():
-        items_str = {str(key): json.dumps(value) for key, value in items.items()}
-        rc.hset(f"{city.lower()}-{collection_name}", mapping=items_str)
+        rc.set(f"{city.lower()}-{collection_name}", json.dumps(items))
 
-
-    # Save city item names as hashes in Redis
     for city, item_names in city_item_names.items():
-        item_names_str = {str(key): str(value) for key, value in item_names.items()}
-        rc.hset(f"{city.lower()}-{collection_name}-Lite", mapping=item_names_str)
-
+        logging.info(f"{city.lower()}-{collection_name}-Lite")
+        logging.info(item_names)
+        rc.set(f"{city.lower()}-{collection_name}-Lite", json.dumps((item_names)))
     
     last_updated_time = time.time()
     rc.set(f"last_updated_{collection_name.lower()}", last_updated_time)
     
     logging.info(f"Cache for collection {collection_name} updated successfully.")
+

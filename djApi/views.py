@@ -164,9 +164,9 @@ def landingPageImages(request):
         signed_url = blob.generate_signed_url(datetime.timedelta(seconds=800), method='GET')
         signed_urls.append(signed_url)
     return JsonResponse({"signed_urls": signed_urls,"count":len(signed_urls)})
-
+'''
 @api_view(['GET'])
-def search(request):
+def search_old(request):
     city = request.GET.get("city", "New Delhi")
     entity = request.GET.get("entity", COLLECTIONS.STUDIO)
 
@@ -202,6 +202,53 @@ def search(request):
     except Exception as e:
         logging.error("Error searching: ", e)
         return JsonResponse({"error": "Internal Server Error"}, status=500)
+'''
+@api_view(['GET'])
+def search(request):
+    city = request.GET.get("city", "New Delhi")
+    entity = request.GET.get("entity", COLLECTIONS.STUDIO)
+
+    query = request.GET.get("query", "")
+    dance_style = request.GET.get("danceStyle", "")
+    level = request.GET.get("level", "All")
+    price = request.GET.get("price", 10**10)
+
+    user_location = (float(request.GET.get("user_lat", 0)), float(request.GET.get("user_lon", 0)))
+
+    logging.info(f"FTS parameters {query}, {city}, {dance_style}, {entity}, {level}, {price}, {user_location}")
+
+    if not city or city.lower() == 'null':
+        return JsonResponse({"error": "City parameter is required."}, status=400)
+
+    try:
+        # Use the new cache structure for retrieving data
+        cache_key = f"{city.lower()}-{entity}"
+        cached_data = rc.hgetall(cache_key)  # Get all fields from the hash
+        
+        # Convert byte strings to their original types
+        cached_data = {k.decode('utf-8'): json.loads(v.decode('utf-8')) for k, v in cached_data.items()}
+
+        logging.info("Before FTS")
+        results = full_text_search(query, dance_style, cached_data, entity=entity, level=level, price=price)
+
+        distance = int(request.GET.get("distance", 20))
+        if user_location != (0, 0):
+            filtered_results = []
+            for result_id, result in results.items():
+                if result.get("geolocation"):
+                    distance_in_kms = calculate_distance(user_location, (float(result["geolocation"]["lat"]), float(result["geolocation"]["lng"])))
+                    if distance_in_kms <= distance:
+                        result["distance_in_kms"] = round(distance_in_kms, 2)
+                        filtered_results.append(result)
+            results = {result["id"]: result for result in filtered_results}
+
+        logging.info("results length: {}".format(len(results)))
+        return JsonResponse(results, safe=False)
+    
+    except Exception as e:
+        logging.error("Error searching: {}".format(e))
+        return JsonResponse({"error": "Internal Server Error"}, status=500)
+
 
 @api_view(['GET'])
 def autocomplete(request):

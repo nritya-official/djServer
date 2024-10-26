@@ -6,6 +6,7 @@ urlpatterns = [
     path('', landing_page, name='landing_page'),
     path('get_all_data/', get_all_data, name='get_all_data'),
     path('search/', search, name='search'),
+    #path('search2/', search2, name='search2'),
     path('autocomplete/', autocomplete, name='autocomplete'),
     path('help/', help, name='help'),
     path('landingPageImages/', landingPageImages, name='landingPageImages'),
