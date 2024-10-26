@@ -309,7 +309,7 @@ def getUserBookings(request, user_id):
             categorized_bookings = {
                 COLLECTIONS.FREE_TRIAL_BOOKINGS: free_trial_results,  # Free trial bookings
                 COLLECTIONS.WORKSHOPS: {},
-                COLLECTIONS.OPEN_CLASSES: {},
+                COLLECTIONS.OPENCLASSES: {},
                 COLLECTIONS.COURSES: {},
             }
             logging.info(bookings_results)
@@ -323,9 +323,9 @@ def getUserBookings(request, user_id):
                     booking_data["studio_name"] = get_name(COLLECTIONS.STUDIO,associated_studio_id)
                     categorized_bookings[COLLECTIONS.WORKSHOPS][booking_id] = booking_data
                 elif entity_type == 'OpenClasses':
-                    booking_data["entity_name"] = get_name(COLLECTIONS.OPEN_CLASSES,entity_id)
+                    booking_data["entity_name"] = get_name(COLLECTIONS.OPENCLASSES,entity_id)
                     booking_data["studio_name"] = get_name(COLLECTIONS.STUDIO,associated_studio_id)
-                    categorized_bookings[COLLECTIONS.OPEN_CLASSES][booking_id] = booking_data
+                    categorized_bookings[COLLECTIONS.OPENCLASSES][booking_id] = booking_data
                 elif entity_type == 'Courses':
                     booking_data["entity_name"] = get_name(COLLECTIONS.COURSES,entity_id)
                     booking_data["studio_name"] = get_name(COLLECTIONS.STUDIO,associated_studio_id)
