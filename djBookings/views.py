@@ -265,7 +265,7 @@ def bookEntity(request):
                 doc_ref = FIREBASE_DB.collection(BOOKINGS).document(ticket_id)
                 doc = doc_ref.get()
 
-                if not doc.exists::  
+                if not doc.exists:  
                     bookings_ref.document(ticket_id).set(new_booking)
                     return ticket_id  
             raise Exception("Failed to generate a unique ticket ID after 7 attempts.")
