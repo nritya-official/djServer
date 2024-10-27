@@ -35,6 +35,45 @@ def send_notification_emails(collection_name, emails, operation_type, entity_id,
     logger.info(f'send_notification_emails task {task}')
     CELERY_APP.send_task('tasks.process_email_task', args=[task])
 
+
+@csrf_exempt
+def updateEntity(request, entity_id):
+    if request.method == 'PUT':
+        try:
+            body = json.loads(request.body)
+            data = body.get('data')
+            collection_name = body.get('collection_name')
+            #emails = body.get('notify', '')
+            #metadata = body.get('metadata', '')
+            logger.info(f'entity_id {entity_id}')
+            logger.info(f'body {body}')
+            # Validate entity type
+            if not is_valid_entity_type(collection_name):
+                return JsonResponse({'Error': 'Entity Type not found.'}, status=nSuccessCodes.NOT_FOUND)
+
+            # Process user creation for other entity types
+            user_id = extract_user_id(request)
+            if user_id:
+                user_ref, user_data = get_user_data(user_id)
+                if user_data is None:
+                    return JsonResponse({'status': 'error', 'message': "User not found."}, status=nSuccessCodes.NOT_FOUND)
+                if not user_data.get('CreatorMode', False):
+                    return JsonResponse({'status': 'error', 'message': "User not a creator."}, status=nSuccessCodes.FORBIDDEN)
+
+                collection_ref = FIREBASE_DB.collection(collection_name).document(entity_id)
+                collection_ref.set(data, merge=True)
+
+            else:
+                return JsonResponse({'status': 'error', 'message': "Please log in again."}, status=nSuccessCodes.UNAUTHORIZED)
+
+            return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
+
+        except Exception as e:
+            logger.error(f"Error occurred: {str(e)}")  
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
 @csrf_exempt
 def newEntity(request):
     if request.method == 'POST':
