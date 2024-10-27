@@ -260,6 +260,7 @@ def bookEntity(request):
             #ticket_id = RedisClient.get_next_ticket_id()
             #bookings_ref.document(ticket_id).set(new_booking)
             max_retries = 7  # Maximum number of retries
+            ticket_id = None
             for attempt in range(max_retries):
                 ticket_id = generate_ticket_id()
                 doc_ref = FIREBASE_DB.collection(COLLECTIONS.BOOKINGS).document(ticket_id)
@@ -267,14 +268,13 @@ def bookEntity(request):
 
                 if not doc.exists:  
                     bookings_ref.document(ticket_id).set(new_booking)
-                    return ticket_id 
                 else:
                     if attempt == max_retries - 1: 
                         raise Exception("Failed to generate a unique ticket ID after 7 attempts.")
-
+            logging.info("Booked Successfully {0}".format(ticket_id))
             return JsonResponse({
                 'nSuccessCode': nSuccessCodes.BOOKING_SUCCESS,
-                'message': 'Booking added successfully'
+                'message': 'Booking added successfully',
             })
 
         except Exception as e:
