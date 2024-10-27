@@ -262,7 +262,7 @@ def bookEntity(request):
             max_retries = 7  # Maximum number of retries
             for attempt in range(max_retries):
                 ticket_id = generate_ticket_id()
-                doc_ref = FIREBASE_DB.collection(BOOKINGS).document(ticket_id)
+                doc_ref = FIREBASE_DB.collection(COLLECTIONS.BOOKINGS).document(ticket_id)
                 doc = doc_ref.get()
 
                 if not doc.exists:  
