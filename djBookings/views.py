@@ -20,6 +20,12 @@ import base64
 import os
 from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view
+import random
+import string
+
+def generate_ticket_id(length=7):
+    characters = string.ascii_uppercase + string.digits  # A-Z and 0-9
+    return ''.join(random.choices(characters, k=length))
 
 def bookingsTest(request):
     logging.info("Hello")
@@ -253,6 +259,16 @@ def bookEntity(request):
             }
             ticket_id = RedisClient.get_next_ticket_id()
             bookings_ref.document(ticket_id).set(new_booking)
+            max_retries = 7  # Maximum number of retries
+            for attempt in range(max_retries):
+                ticket_id = generate_ticket_id()
+                doc_ref = FIREBASE_DB.collection(BOOKINGS).document(ticket_id)
+                doc = doc_ref.get()
+
+                if not doc.exists::  
+                    bookings_ref.document(ticket_id).set(new_booking)
+                    return ticket_id  
+            raise Exception("Failed to generate a unique ticket ID after 7 attempts.")
 
             return JsonResponse({
                 'nSuccessCode': nSuccessCodes.BOOKING_SUCCESS,
