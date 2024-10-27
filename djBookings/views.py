@@ -268,6 +268,7 @@ def bookEntity(request):
 
                 if not doc.exists:  
                     bookings_ref.document(ticket_id).set(new_booking)
+                    break
                 else:
                     if attempt == max_retries - 1: 
                         raise Exception("Failed to generate a unique ticket ID after 7 attempts.")
