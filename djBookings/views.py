@@ -267,8 +267,10 @@ def bookEntity(request):
 
                 if not doc.exists:  
                     bookings_ref.document(ticket_id).set(new_booking)
-                    return ticket_id  
-            raise Exception("Failed to generate a unique ticket ID after 7 attempts.")
+                    return ticket_id 
+                else:
+                    if attempt == max_retries - 1: 
+                        raise Exception("Failed to generate a unique ticket ID after 7 attempts.")
 
             return JsonResponse({
                 'nSuccessCode': nSuccessCodes.BOOKING_SUCCESS,
