@@ -194,7 +194,7 @@ def studioEntityBookingsReport(request):
                 entity_data = entity_doc.to_dict()
                 name = entity_data.get(name_field, 'Unknown')
                 date = entity_data.get('date', 'Unknown Date')
-                capacity = entity_data.get('capacity_field', 0) if capacity_field else None
+                capacity = entity_data.get(capacity_field, 0) if capacity_field else None
                 return name, capacity, date
             return 'Unknown', 0, 'Unknown Date'
 
