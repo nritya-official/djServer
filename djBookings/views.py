@@ -257,8 +257,8 @@ def bookEntity(request):
                 'price_per_person': price_per_person,
                 'timestamp': timestamp
             }
-            ticket_id = RedisClient.get_next_ticket_id()
-            bookings_ref.document(ticket_id).set(new_booking)
+            #ticket_id = RedisClient.get_next_ticket_id()
+            #bookings_ref.document(ticket_id).set(new_booking)
             max_retries = 7  # Maximum number of retries
             for attempt in range(max_retries):
                 ticket_id = generate_ticket_id()
