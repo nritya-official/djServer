@@ -43,7 +43,7 @@ def get_redis_password():
     return config["REDIS_PASSWORD"]
 
 CACHE_UPDATE_INTERVAL = 600
-FIREBASE_CREDENTIALS = credentials.Certificate('utils/config_firebase_staging.json')
+FIREBASE_CREDENTIALS = credentials.Certificate(FIREBASE_CONFIG_FILE)
 FIREBASE_APP = None
 FIREBASE_DB = None
 STORAGE_BUCKET =  None
