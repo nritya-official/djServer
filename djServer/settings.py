@@ -14,7 +14,8 @@ from pathlib import Path
 import os
 import logging
 from datetime import timedelta
-from utils.common_utils import get_celery_broker_url, get_redis_host, get_redis_port, get_redis_username, get_redis_password
+from utils.flags import (get_celery_broker_url, get_redis_host, get_redis_port, 
+                                        get_redis_username, get_redis_password)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
