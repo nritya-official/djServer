@@ -3,7 +3,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt  
-from djApi.flags import FIREBASE_DB, COLLECTIONS, nSuccessCodes
+from utils.flags import FIREBASE_DB
+from utils.common_utils import COLLECTIONS, nSuccessCodes
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
 from .flags import FLAGS
 import json

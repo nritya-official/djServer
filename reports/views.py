@@ -3,7 +3,8 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import JsonResponse
 from django.shortcuts import render
-from djApi.flags import FIREBASE_DB, COLLECTIONS, nSuccessCodes
+from utils.flags import FIREBASE_DB
+from utils.common_utils import COLLECTIONS, STORAGE_FOLDER, nSuccessCodes
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
 from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view

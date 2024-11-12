@@ -4,7 +4,8 @@ from fuzzywuzzy import fuzz
 import redis
 import logging
 from django.core.cache import cache
-from djApi.flags import FIREBASE_DB, COLLECTIONS
+from utils.flags import FIREBASE_DB
+from utils.common_utils import COLLECTIONS, STORAGE_FOLDER
 from geopy.distance import geodesic
 
 logging.basicConfig(level=logging.INFO)

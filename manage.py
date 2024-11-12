@@ -4,7 +4,7 @@ import os
 import sys
 import threading
 import time
-import djApi.flags as flags
+import utils.flags as flags
 import logging
 logging.basicConfig(level=logging.DEBUG)  # Set the desired logging level
 

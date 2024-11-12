@@ -11,13 +11,14 @@ import json
 import logging
 import redis
 from rest_framework.decorators import api_view
-from djApi.flags import FIREBASE_DB, FIREBASE_CREDENTIALS, STORAGE_BUCKET, COLLECTIONS, STORAGE_FOLDER
+from utils.flags import *
+from utils.common_utils import COLLECTIONS, STORAGE_FOLDER
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 
 rc = redis.Redis(
-    host="redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com", port=11857,
-    username="default", # use your Redis user. More info https://redis.io/docs/management/security/acl/
-    password="Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi", # use your Redis password
+    host=get_redis_host(), port=get_redis_port(),
+    username=get_redis_username(), # use your Redis user. More info https://redis.io/docs/management/security/acl/
+    password=get_redis_password(), # use your Redis password
     )
 
 @api_view(['GET'])

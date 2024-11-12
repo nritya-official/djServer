@@ -3,7 +3,7 @@ from django.utils.deprecation import MiddlewareMixin
 import json
 import time
 import logging
-from djApi.flags import FIREBASE_AUTH
+from utils.flags import FIREBASE_AUTH
 import jwt
 
 class PerformanceMonitoringMiddleware(MiddlewareMixin):

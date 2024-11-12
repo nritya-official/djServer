@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from .emailService import load_templates, render_template, send_email_passkey
 from django.views.decorators.csrf import csrf_exempt
-from djApi.flags import FIREBASE_AUTH
+from utils.flags import FIREBASE_AUTH
 import logging
 import jwt
 from rest_framework.views import APIView
