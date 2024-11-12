@@ -6,7 +6,8 @@ from fuzzywuzzy import fuzz
 import redis
 from django.core.cache import cache
 from utils.flags import FIREBASE_CREDENTIALS, STORAGE_BUCKET
-from utils.common_utils import COLLECTIONS, STORAGE_FOLDER
+from utils.common_utils import (COLLECTIONS, STORAGE_FOLDER,
+         get_redis_host, get_redis_port, get_redis_username, get_redis_password)
 from geopy.distance import geodesic
 import time
 import datetime
@@ -46,9 +47,9 @@ class Command(BaseCommand):
             x = x-1
             try:
                 rc = redis.Redis(
-                    host="redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com", port=11857,
-                    username="default", # use your Redis user. More info https://redis.io/docs/management/security/acl/
-                    password="Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi", # use your Redis password
+                    host=get_redis_host(), port=get_redis_port(),
+                    username=get_redis_username(), # use your Redis user. More info https://redis.io/docs/management/security/acl/
+                    password=get_redis_password(), # use your Redis password
                     )
                 rc.set("foo","bar")
 
