@@ -1,11 +1,14 @@
+# djServer/utils/flags.py
+
 import firebase_admin
 import json
 from firebase_admin import credentials, firestore, firestore_async,storage, auth
 from celery import Celery
+import os
 
-STORAGE_BUCKET_NAME = "nritya-7e526.appspot.com"
-REDIS_CONFIG_FILE = "utils/config_redis_staging.json"
-FIREBASE_CONFIG_FILE = "utils/config_firebase_staging.json"
+STORAGE_BUCKET_NAME = "nritya-7e526.appspot.com" # nritya-production.appspot.com
+REDIS_CONFIG_FILE = "utils/config_redis_staging.json" # "utils/config_redis_production.json"
+FIREBASE_CONFIG_FILE = "utils/config_firebase_staging.json" # "utils/config_firebase_production.json" 
 
 with open(REDIS_CONFIG_FILE) as config_file:
     config = json.load(config_file)
@@ -23,6 +26,8 @@ def get_celery_broker_url():
     return config["CELERY_BROKER_URL"]
 
 def get_redis_host():
+    env = os.getenv('DJANGO_ENV', 'production')  
+    print("===",env,"======")
     with open(REDIS_CONFIG_FILE) as config_file:
         config = json.load(config_file)
     return config["REDIS_HOST"]
