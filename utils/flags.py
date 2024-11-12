@@ -26,7 +26,7 @@ def get_celery_broker_url():
     return config["CELERY_BROKER_URL"]
 
 def get_redis_host():
-    env = os.getenv('DJANGO_ENV', 'production')  
+    env = os.getenv('DJANGO_ENV', '---prod---')  
     print("===",env,"======")
     with open(REDIS_CONFIG_FILE) as config_file:
         config = json.load(config_file)
@@ -56,6 +56,8 @@ FIREBASE_AUTH = None
 CELERY_APP = None
 
 def init_firebase():
+    env = os.getenv('DJANGO_ENV', '---prod---')  
+    print("===",env,"======")
     global FIREBASE_APP
     FIREBASE_APP = firebase_admin.initialize_app(FIREBASE_CREDENTIALS)
     global FIREBASE_DB
