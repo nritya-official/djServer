@@ -5,7 +5,8 @@ import json
 from fuzzywuzzy import fuzz
 import redis
 from django.core.cache import cache
-from djApi.flags import FIREBASE_DB, FIREBASE_CREDENTIALS, STORAGE_BUCKET, COLLECTIONS
+from utils.flags import FIREBASE_CREDENTIALS, STORAGE_BUCKET
+from utils.common_utils import COLLECTIONS, STORAGE_FOLDER
 from geopy.distance import geodesic
 import time
 import datetime

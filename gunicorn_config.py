@@ -1,6 +1,6 @@
 # gunicorn_config.py
 import threading
-import djApi.flags as flags
+import utils.flags as flags
 import redis
 import time
 import logging
