@@ -51,7 +51,7 @@ class Command(BaseCommand):
                     username=get_redis_username(), # use your Redis user. More info https://redis.io/docs/management/security/acl/
                     password=get_redis_password(), # use your Redis password
                     )
-                //rc.set("foo","bar")
+                #rc.set("foo","bar")
 
         
                 logging.info("Shared task")
