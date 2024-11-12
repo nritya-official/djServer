@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 import logging
 from datetime import timedelta
-
+from utils.common_utils import get_celery_broker_url, get_redis_host, get_redis_port, get_redis_username, get_redis_password
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,12 +33,12 @@ CORS_ALLOW_ALL_HEADERS = True
 CORS_ALLOW_ALL_METHODS = True
 
 # Redis connection details
-REDIS_HOST = 'redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com'
-REDIS_PORT = 11857
-REDIS_USERNAME = 'default'  # Use the correct Redis user
-REDIS_PASSWORD = 'Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi'  # Use your Redis password
+REDIS_HOST = get_redis_host()
+REDIS_PORT = get_redis_port()
+REDIS_USERNAME = get_redis_username()  # Use the correct Redis user
+REDIS_PASSWORD = get_redis_password() # Use your Redis password
 
-CELERY_BROKER_URL = f'redis://{REDIS_USERNAME}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0'
+CELERY_BROKER_URL = get_celery_broker_url()
 
 # You can also define other Redis-related configurations
 REDIS_DB = 0  # Optional, use the default Redis database

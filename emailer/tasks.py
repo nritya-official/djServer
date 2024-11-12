@@ -6,17 +6,13 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from jinja2 import Environment, FileSystemLoader, Template
+from utils.common_utils import get_celery_broker_url()
 
 logging.basicConfig(level=logging.INFO)
 #logger = logging.getLogger(__name__)
 logger = logging.getLogger("Celery")
 
-REDIS_HOST = 'redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com'
-REDIS_PORT = 11857
-REDIS_USERNAME = 'default'  # Use the correct Redis user
-REDIS_PASSWORD = 'Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi'  # Use your Redis password
-
-CELERY_BROKER_URL = f'redis://{REDIS_USERNAME}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0'
+CELERY_BROKER_URL = get_celery_broker_url()
 
 app = Celery('tasks', broker=CELERY_BROKER_URL)
 
