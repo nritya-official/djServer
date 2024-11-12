@@ -5,9 +5,9 @@ import json
 from fuzzywuzzy import fuzz
 import redis
 from django.core.cache import cache
-from utils.flags import FIREBASE_CREDENTIALS, STORAGE_BUCKET
-from utils.common_utils import (COLLECTIONS, STORAGE_FOLDER,
-         get_redis_host, get_redis_port, get_redis_username, get_redis_password)
+from utils.flags import (FIREBASE_CREDENTIALS, STORAGE_BUCKET, get_redis_host, 
+            get_redis_port, get_redis_username, get_redis_password)
+from utils.common_utils import COLLECTIONS, STORAGE_FOLDER
 from geopy.distance import geodesic
 import time
 import datetime
@@ -51,7 +51,7 @@ class Command(BaseCommand):
                     username=get_redis_username(), # use your Redis user. More info https://redis.io/docs/management/security/acl/
                     password=get_redis_password(), # use your Redis password
                     )
-                rc.set("foo","bar")
+                //rc.set("foo","bar")
 
         
                 logging.info("Shared task")

@@ -67,4 +67,3 @@ def init_firebase():
 
     global CELERY_APP
     CELERY_APP =  Celery('tasks', broker= CELERY_BROKER_URL)
-
