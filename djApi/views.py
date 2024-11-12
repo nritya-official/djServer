@@ -4,7 +4,6 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.shortcuts import render
 from .processor import cache, full_text_search, calculate_distance
-from djApi.flags import *
 import datetime
 from fuzzywuzzy import fuzz
 import json
