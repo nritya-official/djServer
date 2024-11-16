@@ -37,6 +37,7 @@ collection_name_field ={
 }
 
 class Command(BaseCommand):
+    logging.info('Updating cache')
     help = 'Manages cache updation'
     logging.info(FIREBASE_CREDENTIALS)
     logging.info(STORAGE_BUCKET)
