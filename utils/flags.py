@@ -10,7 +10,7 @@ STORAGE_BUCKET_NAME = env_config["STORAGE_BUCKET_NAME"]
 REDIS_CONFIG_FILE = env_config["REDIS_CONFIG_FILE"]
 FIREBASE_CONFIG_FILE = env_config["FIREBASE_CONFIG_FILE"]
 ENVIRONMENT = env_config["ENVIRONMENT"]
-
+print(ENVIRONMENT,"<->",STORAGE_BUCKET_NAME,"<->",REDIS_CONFIG_FILE,"<->",FIREBASE_CONFIG_FILE)
 
 with open(REDIS_CONFIG_FILE) as config_file:
     config = json.load(config_file)
