@@ -7,6 +7,7 @@ backend\Scripts\activate.bat
 python manage.py runserver [not for us]
 gunicorn djServer.wsgi:application --config gunicorn_config.py
 
+RUN BEFORE AFTER JSON: python manage.py collectstatic --noinput
 
 heroku login
 heroku ps:scale web=1 -a nrityaserver

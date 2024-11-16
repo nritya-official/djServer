@@ -1,0 +1,7 @@
+{
+    "REDIS_HOST": "redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com",
+    "REDIS_PORT": 11857,
+    "REDIS_USERNAME": "default",
+    "REDIS_PASSWORD": "Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi",
+    "CELERY_BROKER_URL": "redis://default:Fw82cxCVcMZED9ubfJVxeuSqcCb1vFqi@redis-11857.c276.us-east-1-2.ec2.cloud.redislabs.com:11857/0"
+}
