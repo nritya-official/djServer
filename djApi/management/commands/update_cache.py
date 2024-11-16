@@ -38,7 +38,8 @@ collection_name_field ={
 
 class Command(BaseCommand):
     help = 'Manages cache updation'
-
+    logging.info(FIREBASE_CREDENTIALS)
+    logging.info(STORAGE_BUCKET)
     def handle(self, *args, **options):
         interval = 5
         logging.info(f'Scheduling cache update every {interval} minutes...')
