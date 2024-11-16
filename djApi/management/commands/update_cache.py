@@ -77,7 +77,7 @@ def update_cache(rc):
     
     if not globals().get('STORAGE_BUCKET'):
         app = firebase_admin.initialize_app(FIREBASE_CREDENTIALS, {
-            'storageBucket': 'nritya-7e526.appspot.com',
+            'storageBucket': STORAGE_BUCKET,
         }, name='storage')
         globals()['STORAGE_BUCKET'] = storage.bucket(app=app)
 
