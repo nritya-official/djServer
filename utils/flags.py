@@ -94,4 +94,4 @@ def get_env():
 
 def get_storage_bucket_name():
     env_config = load_environment()
-    return STORAGE_BUCKET_NAME = env_config["STORAGE_BUCKET_NAME"]
+    return env_config["STORAGE_BUCKET_NAME"]
