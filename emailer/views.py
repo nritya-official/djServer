@@ -6,10 +6,16 @@ from utils.flags import FIREBASE_AUTH
 import logging
 import jwt
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+
+@api_view(['GET'])
+def testEndpoint(request):
+    logging.info("Hello from emailer")
+    return JsonResponse({'message': 'This is the emailer endpoint.'})
 
 def authVerifier():
     try:

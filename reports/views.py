@@ -13,6 +13,11 @@ import logging
 # Create your views here.
 
 @api_view(['GET'])
+def testEndpoint(request):
+    logging.info("Hello from report")
+    return JsonResponse({'message': 'This is the report endpoint.'})
+
+@api_view(['GET'])
 def getAllOwnerStudio(request):
     # Create a mapping of <StudioId>: StudioName
     logging.info("getAllOwnerStudio")

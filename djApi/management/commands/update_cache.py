@@ -6,7 +6,8 @@ from fuzzywuzzy import fuzz
 import redis
 from django.core.cache import cache
 from utils.flags import (FIREBASE_CREDENTIALS, STORAGE_BUCKET, get_redis_host, 
-            get_redis_port, get_redis_username, get_redis_password)
+            get_redis_port, get_redis_username, get_redis_password,
+            get_storage_bucket_name)
 from utils.common_utils import COLLECTIONS, STORAGE_FOLDER
 from geopy.distance import geodesic
 import time
@@ -75,7 +76,7 @@ def update_cache(rc):
     
     if not globals().get('STORAGE_BUCKET'):
         app = firebase_admin.initialize_app(FIREBASE_CREDENTIALS, {
-            'storageBucket': 'nritya-7e526.appspot.com',
+            'storageBucket': get_storage_bucket_name(),
         }, name='storage')
         globals()['STORAGE_BUCKET'] = storage.bucket(app=app)
 
