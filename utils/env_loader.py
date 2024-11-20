@@ -9,7 +9,7 @@ def load_environment():
 
     if environment == "production":
         return {
-            "STORAGE_BUCKET_NAME": "nritya-production.appspot.com",
+            "STORAGE_BUCKET_NAME": "nritya-production.firebasestorage.app",
             "REDIS_CONFIG_FILE": os.path.join(os.path.dirname(__file__), "config_redis_production.json"),
             "FIREBASE_CONFIG_FILE": os.path.join(os.path.dirname(__file__), "config_firebase_production.json"),
             "ENVIRONMENT": environment,
