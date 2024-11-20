@@ -1,14 +1,14 @@
 {
-    "type": "service_account",
-    "project_id": "nritya-production",
-    "private_key_id": "1ea4b82fe72365a6a8d1b5c0cfb83ed4e001fc5b",
-    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCjm6DTv2ekjgqr\nV4OrlMV/yJ9bFOZBsQ/4wIvIiwEzpprLUA/dxsImDp+V4jpr2DlpVnO8HCP0rK8c\nN2i9LY3r1WubBGuyXUjl5fSLvs+4zbCQae0wF5luY6M/FnP78sMw+5jFQQV2/4/J\nz+XyCdsxJYA3tiT+H1SR6hiVGpYH1V0qBiqN9WJWcFe9Mozwk91Mb3ZSicMQm5nm\nk3NAOViZPtmjYBsZEgWJYF+Kv3EwYL/CrY63UCYz9T+OavlEXMFxo8eikbZOa8gz\nJykeQhSWm60S8724zqeJesycWF3UPSR2vo3QcmWLfJBJnbICXI/XfkV2Ks7wLHxQ\nWBiVRt6pAgMBAAECggEARtg8l4Rh4kkZiKFQJEu7C765dmzB2f9MfbgOr2u1vQJv\nNAu6mxuWdXlOlE4OYyWRkrH7UqDS1v+xoePCaGyh8FWNj2YmJmmrh9WAA8U/2HPE\n+XvM187YQwtFJKvZ1GcGK58+w2eI8MLwJgDuvtSSxCDLeRRXx2yUp8x5EZOeFMyW\n5KhspScOg937kIO5cGvWA5XD9wOQaDHJj7UQ1o/foIDjWXiw29CT4hGpM3hXNOQF\ncfJt0I/6UfMMtSzTiG088eAYYkPA4y6R0VB2VIisKg/jdJL3iX0BmJAkc6BR2fqP\nGubXLxP/bajzMALLvgeI9TxAX3WfvQQSbhbdZrU8swKBgQDfypYn9dkX9tFlXkRm\nvMqXgTpuL9Q5hxmQHnLgopPrfw8ZdqWvSQHJExFTYz2aNmn3JRnWzzxRPiAPYbAM\n5LeqF+vK9THPlYtN51tHbVHOdlkSgBWp+54lL7AggFQ7oAG41TdbcinBKOVz7LLr\n5q6kLZ8CybKfj0Qge76IFOP5nwKBgQC7J6GdCBJe2ge61D6hNczHIJi6/+7pNesd\nszFsYk8peBbve030iJ5M3Ye6WyNUn0QDX6CFbhuJa3ieYG7oH1ra0bEllp49KUFa\ncuP5pEg+fNmwv1iGpv9mCJHanB18sdObZH4709RCPZwyCTrvmM0scwcPSw6iU4be\nxH/XZpXStwKBgAqc7OoQOq9sQRnxkoTcxy7QLhkzo3jm80tmZkRI8YLlj63BdrIN\nYExM3zF5L1603emelM8fHNktfQ+9rj+uSReD8ua5IheaG/Uh165XfN2xtx+te1mI\nWUOiM1QXQedh+zLsyadIjrpeWiNZQlL1qaqXj0bukc4HWU/BDpQdiYI5AoGBAJEg\nlk4y6CvtXnkeBML1+SmguU6pEBZ/3SZWwkiNo11A5mgmcbjiB/8K+ikkay0/o3oK\nOWu+ilPxpsMJfHc7eTSdzoSbW3GKAEenN+lp3yu1nQlWF8uyy/HPS2r+DE+ZhcHG\nF61FAh+rrueOCMmq7888E4lkZqCxrLAqKAhcYGnZAoGBAIzzWEYtUI68Ixd0RQq6\nzdoS5ZP7rOuDI6ugO31tsXt1T+2nqNqLLbqpZpWVXwAxHnBhwCFxGfyBpj2GGIsP\n+TfBnJ0mlF5i0kz+xrWJSRLbPfutxwKhnwoXH0+3qwhD2wFHWcK/WMvZm/PB6kiS\nIcNax4Tcv/h7EYHAQyJWJw0t\n-----END PRIVATE KEY-----\n",
-    "client_email": "firebase-adminsdk-w80u6@nritya-production.iam.gserviceaccount.com",
-    "client_id": "111543794672794148830",
-    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-    "token_uri": "https://oauth2.googleapis.com/token",
-    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-w80u6%40nritya-production.iam.gserviceaccount.com",
-    "universe_domain": "googleapis.com"
-  }
+  "type": "service_account",
+  "project_id": "nritya-production",
+  "private_key_id": "bfb65c51e5727e911896625d21d771207e180048",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCs2/lGzBuRFA0Y\ndqpXix80yru2168SFkuFo9cJ0MscskHZ63IISi2LIBOEpVw9jQ4/WrC/GGgaL/4k\n2his4FpYxCTO+v5WMkBN6vl1IlSaWoMwYkjeV9yqciaohRD/IZNmQ0yzWRg36c2G\nNeefRDSGikVy9FsBbGIrVLQPjc28/1ad93IQTSi2wBu0xCYrGirBJpcVFyK2OSu7\ncoBJtnqwutrfDgs9Oas/9XGlVkraQWEIkN1rEYzsjGk6jnrFAUn+Hqiq4+CDdzj+\nPWsWpIYk+qhFLcxWgKzpVlrmdVttHhiFodANEKFY2KPZfDTPJwmHypeS+ojaYMdx\n6c2uuwWvAgMBAAECggEACHopOW2dFHpVQhPfurdZ6m7e0dK2BT8OqRkl3JdevqOH\nUzaWuw1YOnByRJkPcv1N65F5BYYe5NnhrtD7UM8X3y6PV487leKVAL07SqFKYN97\ne432YOESM1Gxz6Xm9XwiDGvUgR8nbuaKa8CNAWSI5ug1C7QsGl/EWLeotPKRWmle\nmCY6iXEu/FXEtSY7xYav8TwbNgiLG33HbeHdINfSh1jVufZpY121+Liy2ui2NQFD\nhJjhxRZTLFWMBlaschLrsv5NThBYYkOSdtjqoXiqVshCiLaA3B0UQdM0HJV1FMzf\nHUMO4srUUZJMr4ZdBnlUFpnaBw0IKsUcP1DiiUNI8QKBgQDiLWFJwHCTjgzT8wei\niJYmPw4xjbhO5ypw/f26NCuysusaTtFQJL0sOa7BtmY8/1QV1fYUYdfnP7o4kuBX\nxFw9jW84B3npi/oUsackz3d9iEOXW1YMWo61PRY2zNBQFqvKX3RRB2Kkr144rmvB\naaP+VdY11dBTCCAZlyns/b3l5QKBgQDDptflHL9laAr5JbQoNspQBidV5+142BE0\neX10dvW5Pg+03uwEEvuDc1hnUolfwm+4pmLXN2pfh3ydoJ2BunFLDZlF6n2uwQK9\nMlnws47cXrLRwIAq085BCh99KuI+S0yOp/73ySrKxKt2pushSeyd6zqVmY5QmZkr\nq4FxU6bEAwKBgQCiwzlx05Sv+tdsZ0YlRtmWqGXUb0IlNeGq8nz21Lhlnq/lfLbQ\nT7/65X/HUzV7y9p85D50KH0wowGl2LytLFecy/0veuHWma7b2YSIzuwUYE0TzNy9\ngyWTc2RbB0UZfVcfCVYxQXlRPgo2C/7rbtRfIPJIR5flSMGg6NF5BJj1qQKBgBBF\nLasF6vy53D+/3O2DMOvatyaztNHZ1gRxHfezdNfEy3WVHDdyhKv3yaA+AuKNvtCy\nNYIEP7pWAAzzsGV7ZbSCGv7vcyg3MM0fBM+5fuXgkipTQdVN69cIynmUOWBIzsMG\nQXPFrONT25ZwZxlLlnvDdgm+zVDylQRGrOsJs9KVAoGBAIQVmDgj31F62Bi5vXuP\nDWK3337o7KMV65izhTW425JZPpk092BGZJcGXLKHccraaEDA6Bb94T0tC+8SvTTA\nqi+GJZHtBDR+a8PsRppIuBuigTx9ZAafo4aUtJFBuJZnRro+iNuLLA71HRa2+7Gd\nW02e5upGYJ3bBB9H49VTQzUi\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-w80u6@nritya-production.iam.gserviceaccount.com",
+  "client_id": "111543794672794148830",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-w80u6%40nritya-production.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
   
