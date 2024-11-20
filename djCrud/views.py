@@ -77,14 +77,13 @@ def updateEntity(request, entity_id):
 @csrf_exempt
 def newEntity(request):
     if request.method == 'POST':
-        logger.info("newEntity")
         try:
             body = json.loads(request.body)
             data = body.get('data')
             collection_name = body.get('collection_name')
             emails = body.get('notify', '')
             metadata = body.get('metadata', '')
-            logger.info(data)
+            
             # Validate entity type
             if not is_valid_entity_type(collection_name):
                 return JsonResponse({'Error': 'Entity Type not found.'}, status=nSuccessCodes.NOT_FOUND)
@@ -93,7 +92,6 @@ def newEntity(request):
             operation_type, entity_created_key, collection_ref = handle_entity_creation(collection_name, data)
 
             if collection_name == COLLECTIONS.USER:
-                logger.info("user creation")
                 return create_user_entity(collection_name, operation_type, data, emails, metadata)
 
             # Process user creation for other entity types
@@ -153,20 +151,16 @@ def handle_entity_creation(collection_name, data):
 
 def create_user_entity(collection_name, operation_type, data, emails, metadata):
     """Creates a new user entity and returns the response."""
-    logger.info(f'From create_user_entity')
     user_id = metadata.get('user_id',None)
-    try:
-        collection_ref = FIREBASE_DB.collection(collection_name).document(user_id)
-        if emails and is_valid_entity_type(collection_name) and collection_ref and user_id:
-            collection_ref.set(data)
-            logger.info(f'create_user_entity collection_name {collection_name}, emails {emails},operation_type {operation_type} ,User Id {user_id},metadata {metadata}')
-            send_notification_emails(collection_name, emails, operation_type , collection_ref.id, metadata)
-            return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
-        else:
-            return JsonResponse({'status': 'success', 'message': 'Failure no proper gmail.'}, status=nSuccessCodes.FAILURE)
-    except Exception as e:
-        logger.info(f'Exception {e}')
-        return JsonResponse({'status': 'success', 'message': 'Login failure.'}, status=nSuccessCodes.FAILURE)
+    collection_ref = FIREBASE_DB.collection(collection_name).document(user_id)
+    if emails and is_valid_entity_type(collection_name) and collection_ref and user_id:
+        collection_ref.set(data)
+        logger.info(f'create_user_entity collection_name {collection_name}, emails {emails},operation_type {operation_type} ,User Id {user_id},metadata {metadata}')
+        send_notification_emails(collection_name, emails, operation_type , collection_ref.id, metadata)
+        return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
+    else:
+        return JsonResponse({'status': 'success', 'message': 'Failure no proper gmail.'}, status=nSuccessCodes.FAILURE)
+
 def get_user_data(user_id):
     """Retrieves user data from Firebase."""
     user_ref = FIREBASE_DB.collection(COLLECTIONS.USER).document(user_id)
