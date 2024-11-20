@@ -43,6 +43,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         interval = 5
         logging.info(f'Scheduling cache update every {interval} minutes...')
+        logging.info(f'get_storage_bucket_name {get_storage_bucket_name()}')
         x=2
         while x:
             x = x-1
