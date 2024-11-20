@@ -6,7 +6,8 @@ from fuzzywuzzy import fuzz
 import redis
 from django.core.cache import cache
 from utils.flags import (FIREBASE_CREDENTIALS, STORAGE_BUCKET, get_redis_host, 
-            get_redis_port, get_redis_username, get_redis_password)
+            get_redis_port, get_redis_username, get_redis_password,
+            get_storage_bucket_name)
 from utils.common_utils import COLLECTIONS, STORAGE_FOLDER
 from geopy.distance import geodesic
 import time
@@ -41,6 +42,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         interval = 5
         logging.info(f'Scheduling cache update every {interval} minutes...')
+        logging.info(f'get_storage_bucket_name {get_storage_bucket_name()}')
         x=2
         while x:
             x = x-1
@@ -74,7 +76,7 @@ def update_cache(rc):
     
     if not globals().get('STORAGE_BUCKET'):
         app = firebase_admin.initialize_app(FIREBASE_CREDENTIALS, {
-            'storageBucket': STORAGE_BUCKET,
+            'storageBucket': get_storage_bucket_name(),
         }, name='storage')
         globals()['STORAGE_BUCKET'] = storage.bucket(app=app)
 

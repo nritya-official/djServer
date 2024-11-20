@@ -27,10 +27,10 @@ def generate_ticket_id(length=7):
     characters = string.ascii_uppercase + string.digits  # A-Z and 0-9
     return ''.join(random.choices(characters, k=length))
 
-def bookingsTest(request):
-    logging.info("Hello")
+@api_view(['GET'])
+def testEndpoint(request):
+    logging.info("Hello from djBookings")
     return JsonResponse({'message': 'This is the bookings endpoint.'})
-
 
 def _get_user_info(user_id):
     logging.info(f'Getting User info for {user_id}')

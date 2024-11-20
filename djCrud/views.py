@@ -19,8 +19,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def crudTest(request):
-    logging.info("Hello")
+def testEndpoint(request):
+    logging.info("Hello from djCrud")
     return JsonResponse({'message': 'This is the crud endpoint.'})
 
 def send_notification_emails(collection_name, emails, operation_type, entity_id, metadata):

@@ -5,6 +5,7 @@ from twilio.rest import Client
 from django.core.cache import cache
 from djSms.flags import TWILIO_CREDS
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
 import logging
 
 # Utility function to generate a random OTP
@@ -25,6 +26,7 @@ def send_otp(phone_number, otp):
     return message.sid
 
 # Utility function to store OTP in cache with a timeout
+@api_view(['POST'])
 def store_otp(phone_number, otp):
     phone_number = "+91" + phone_number
     expiration_time = 300  # 5 minutes
@@ -42,6 +44,11 @@ def _verify_otp(phone_number, user_otp):
         logging.info(f'{phone_number} verified')
         return True
     return False
+
+@api_view(['GET'])
+def testEndpoint(request):
+    logging.info("Hello from djSms")
+    return JsonResponse({'message': 'This is the djSms endpoint.'})
 
 # 1. Endpoint to request OTP generation
 @csrf_exempt
@@ -62,6 +69,7 @@ def request_otp(request):
 
 # 2. Endpoint to verify the OTP
 @csrf_exempt
+@api_view(['POST'])
 def confirm_otp(request):
     logging.debug("confirm_otp")
     if request.method == 'POST':

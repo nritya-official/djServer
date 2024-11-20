@@ -91,3 +91,7 @@ def get_redis_password():
 def get_env():
     env_config = load_environment()
     return env_config["ENVIRONMENT"]
+
+def get_storage_bucket_name():
+    env_config = load_environment()
+    return env_config["STORAGE_BUCKET_NAME"]

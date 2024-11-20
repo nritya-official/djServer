@@ -1,6 +1,7 @@
 import json
 import os
 import razorpay
+from django.http import JsonResponse
 from utils.flags import FIREBASE_DB
 from payments.constants import PAYMENT_STATUS
 from rest_framework import status
@@ -148,6 +149,11 @@ def check_event_availability(entity_id, entity_type, user_id, persons_allowed=1)
     capacity = entity_data.get("capacity", 0)
     is_capacity_ok, capacity_message = capacity_check(entity_id, entity_type, user_id, capacity, persons_allowed)
     return is_capacity_ok, capacity_message
+
+@api_view(['GET'])
+def testEndpoint(request):
+    logging.info("Hello from payments")
+    return JsonResponse({'message': 'This is the payment endpoint.'})
 
 @api_view(['POST'])
 def intitate_booking(request):
