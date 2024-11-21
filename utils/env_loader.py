@@ -1,5 +1,20 @@
 import os
 from dotenv import load_dotenv
+import json
+
+def get_firebase_config_production():
+    firebase_config_json = os.environ.get("firebase_keys_production")
+    if firebase_config_json:
+        return json.loads(firebase_config_json)
+    else:
+        return os.path.join(os.path.dirname(__file__), "config_firebase_production.json")
+
+def get_firebase_config_staging():
+    firebase_config_json = os.environ.get("firebase_keys_staging")
+    if firebase_config_json:
+        return json.loads(firebase_config_json)
+    else:
+        return os.path.join(os.path.dirname(__file__), "config_firebase_staging.json")
 
 def load_environment():
     """Load environment variables and return configuration values."""
@@ -11,13 +26,13 @@ def load_environment():
         return {
             "STORAGE_BUCKET_NAME": "nritya-production.firebasestorage.app",
             "REDIS_CONFIG_FILE": os.path.join(os.path.dirname(__file__), "config_redis_production.json"),
-            "FIREBASE_CONFIG_FILE": os.path.join(os.path.dirname(__file__), "config_firebase_production.json"),
+            "FIREBASE_CONFIG_FILE": get_firebase_config_production(),
             "ENVIRONMENT": environment,
         }
     else:
         return {
             "STORAGE_BUCKET_NAME": "nritya-7e526.appspot.com",
             "REDIS_CONFIG_FILE": os.path.join(os.path.dirname(__file__), "config_redis_staging.json"),
-            "FIREBASE_CONFIG_FILE": os.path.join(os.path.dirname(__file__), "config_firebase_staging.json"),
+            "FIREBASE_CONFIG_FILE": get_firebase_config_staging(),
             "ENVIRONMENT": environment,
         }
