@@ -105,6 +105,34 @@ def send_gmail_email(receiver_email, title, body, url, subject ):
     finally:
         server.quit()
 
+def send_outlook_email(receiver_email, title, body, url, subject ):
+    # Set up the server
+    smtp_server = "smtp.office365.com"
+    smtp_port = 587
+    sender_email = "nritya@nritya.co.in"
+    app_password = "W9CGFFRp3Ygsv/y"
+
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg['Subject'] = subject
+    html_content = load_html_template(title, body, url)
+    logger.info(f'title {title}, body {body}, url {url}, subject {subject}')
+    msg.attach(MIMEText(html_content, 'html'))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls() 
+        server.login(sender_email, app_password)
+        server.sendmail(sender_email, receiver_email, msg.as_string())
+        logger.info(f'Email sent successfully from {sender_email} to {receiver_email}')
+
+    except Exception as e:
+        logger.info(f'Failed to send email. Error: {str(e)}')
+
+    finally:
+        server.quit()
+
 
 @app.task(name='tasks.process_email_task')
 def process_email_task(email_data):
@@ -116,7 +144,7 @@ def process_email_task(email_data):
             collection_name = email_data.get('collection_name', None)
             operation_type = email_data.get('operation_type', NOTIFICATION.OP_CREATE)
             title, body, url, subject = generate_tbus(email_data)
-            send_gmail_email(receiver_email, title, body, url, subject )
+            send_outlook_email(receiver_email, title, body, url, subject )
 
     except Exception as e:
         logger.error(f"Failed to process email task: {str(e)}")
