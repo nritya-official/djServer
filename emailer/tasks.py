@@ -9,11 +9,6 @@ from jinja2 import Environment, FileSystemLoader, Template
 from utils.flags import get_celery_broker_url
 
 logging.basicConfig(level=logging.INFO)
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s - Line: %(lineno)d',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
 #logger = logging.getLogger(__name__)
 logger = logging.getLogger("Celery")
 

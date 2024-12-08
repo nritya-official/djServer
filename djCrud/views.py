@@ -37,7 +37,7 @@ def send_notification_emails(collection_name, emails, operation_type, entity_id,
         "entity_id" : entity_id,
         "metadata" : metadata
     }
-    logger.info(f'send_notification_emails task {task}')
+    logging.info(f'send_notification_emails task {task}')
     CELERY_APP.send_task('tasks.process_email_task', args=[task])
 
 
@@ -50,8 +50,8 @@ def updateEntity(request, entity_id):
             collection_name = body.get('collection_name')
             #emails = body.get('notify', '')
             #metadata = body.get('metadata', '')
-            logger.info(f'entity_id {entity_id}')
-            logger.info(f'body {body}')
+            logging.info(f'entity_id {entity_id}')
+            logging.info(f'body {body}')
             # Validate entity type
             if not is_valid_entity_type(collection_name):
                 return JsonResponse({'Error': 'Entity Type not found.'}, status=nSuccessCodes.NOT_FOUND)
@@ -74,7 +74,7 @@ def updateEntity(request, entity_id):
             return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
 
         except Exception as e:
-            logger.error(f"Error occurred: {str(e)}")  
+            logging.error(f"Error occurred: {str(e)}")  
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
@@ -175,12 +175,12 @@ def newEntity(request):
             # Send notifications if required
             if emails and operation_type and collection_ref.id:
                 send_notification_emails(collection_name, emails, operation_type, collection_ref.id, metadata)
-                logger.info(collection_ref.id)
+                logging.info(collection_ref.id)
 
             return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
 
         except Exception as e:
-            logger.error(f"Error occurred: {str(e)}")  
+            logging.error(f"Error occurred: {str(e)}")  
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
@@ -219,7 +219,7 @@ def create_user_entity(collection_name, operation_type, data, emails, metadata):
     collection_ref = FIREBASE_DB.collection(collection_name).document(user_id)
     if emails and is_valid_entity_type(collection_name) and collection_ref and user_id:
         collection_ref.set(data)
-        logger.info(f'create_user_entity collection_name {collection_name}, emails {emails},operation_type {operation_type} ,User Id {user_id},metadata {metadata}')
+        logging.info(f'create_user_entity collection_name {collection_name}, emails {emails},operation_type {operation_type} ,User Id {user_id},metadata {metadata}')
         send_notification_emails(collection_name, emails, operation_type , collection_ref.id, metadata)
         return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
     else:
@@ -238,7 +238,7 @@ def get_entity_data(entity_id, collection_name = COLLECTIONS.STUDIO):
     entity_ref = FIREBASE_DB.collection(collection_name).document(entity_id)
     entity_snap = entity_ref.get()
     if entity_snap.exists:
-        return entity_ref, entity.to_dict()
+        return entity_ref, entity_snap.to_dict()
     return entity_ref, None
 
 def update_user_entity_created(user_ref, entity_created_key, collection_id, user_data):
