@@ -16,6 +16,16 @@ def get_firebase_config_staging():
     else:
         return os.path.join(os.path.dirname(__file__), "config_firebase_staging.json")
 
+def base_web_url():
+    dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.env"))
+    load_dotenv(dotenv_path=dotenv_path)
+    environment = os.getenv("ENVIRONMENT", "staging").lower()
+    if environment == "production":
+        return 'https://www.nritya.co.in/nritya-webApp'
+    else:
+        return 'https://nritya-official.github.io/nritya-webApp'
+
+
 def load_environment():
     """Load environment variables and return configuration values."""
     dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.env"))

@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt  
 from utils.flags import FIREBASE_DB, CELERY_APP
+from utils.env_loader import base_web_url
 from utils.common_utils import is_valid_entity_type, extract_user_id, COLLECTIONS, NOTIFICATION, nSuccessCodes
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
 import json
@@ -108,6 +109,62 @@ def newEntity(request):
                 update_time, collection_ref = collection_ref.add(data)
                 update_user_entity_created(user_ref, entity_created_key, collection_ref.id, user_data)
 
+                # Prepare data for email notification over redis-celery
+                base_url = base_web_url()
+                user_name = user_data.get('Name', None)
+                metadata['user_name'] = user_name if user_name else metadata.get('user_name')
+                studio_id = None
+                entity_url = None
+                studio_name = None
+                studio_street_name = None
+                studio_city_name = None
+
+                if collection_name == COLLECTIONS.STUDIO:
+                    # Studio Details
+                    studio_street_name = data.get('street',None)
+                    studio_city_name = data.get('city',None)
+                    studio_name = data.get('studioName',None)
+                    studio_id = collection_ref.id
+                    entity_url = f"{base_url}/#/studio/{studio_id}"
+
+                    metadata.update({
+                        'studio_street_name': studio_street_name,
+                        'studio_city_name': studio_city_name,
+                        'studio_name': studio_name,
+                        'studio_id': studio_id,
+                        'entity_url': entity_url,
+                    })
+                
+                elif collection_name in [COLLECTIONS.WORKSHOPS, COLLECTIONS.OPENCLASSES, COLLECTIONS.COURSES]:
+                    entity_id = collection_ref.id
+                    studio_id = data.get('StudioId',None)
+
+                    studio_ref, studio_data = get_entity_data(studio_id)
+                    if studio_data:
+                        studio_street_name = studio_data.get('street',None)
+                        studio_city_name = studio_data.get('city',None)
+                        studio_name = studio_data.get('studioName',None)
+
+                    if collection_name == COLLECTIONS.WORKSHOPS: 
+                        entity_name = data.get('workshopName',None)
+                        entity_url = f"{base_url}/#/workshop/{entity_id}"
+                    elif collection_name == COLLECTIONS.OPENCLASSES:
+                        entity_name = data.get('openClassName',None)
+                        entity_url = f"{base_url}/#/openClass/{entity_id}"
+                    elif collection_name == COLLECTIONS.COURSES:
+                        entity_name = data.get('courseName',None)
+                        entity_url = f"{base_url}/#/course/{entity_id}"
+                    
+                    metadata.update({
+                        'studio_street_name': studio_street_name,
+                        'studio_city_name': studio_city_name,
+                        'studio_name': studio_name,
+                        'studio_id': studio_id,
+                        'entity_url': entity_url,
+                        'entity_id': entity_id,
+                        'entity_name': entity_name
+                    })
+
             else:
                 return JsonResponse({'status': 'error', 'message': "Please log in again."}, status=nSuccessCodes.UNAUTHORIZED)
 
@@ -152,6 +209,9 @@ def handle_entity_creation(collection_name, data):
 def create_user_entity(collection_name, operation_type, data, emails, metadata):
     """Creates a new user entity and returns the response."""
     user_id = metadata.get('user_id',None)
+    user_name = data.get('Name', None)
+    if user_name:
+        metadata['user_name'] = user_name
     collection_ref = FIREBASE_DB.collection(collection_name).document(user_id)
     if emails and is_valid_entity_type(collection_name) and collection_ref and user_id:
         collection_ref.set(data)
@@ -168,6 +228,14 @@ def get_user_data(user_id):
     if user_snap.exists:
         return user_ref, user_snap.to_dict()
     return user_ref, None
+
+def get_entity_data(entity_id, collection_name = COLLECTIONS.STUDIO):
+    """Retrieves entity data from Firebase."""
+    entity_ref = FIREBASE_DB.collection(collection_name).document(entity_id)
+    entity_snap = entity_ref.get()
+    if entity_snap.exists:
+        return entity_ref, entity.to_dict()
+    return entity_ref, None
 
 def update_user_entity_created(user_ref, entity_created_key, collection_id, user_data):
     """Updates the user's entity created list."""
