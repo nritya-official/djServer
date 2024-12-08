@@ -28,7 +28,7 @@ def testEndpoint(request):
     logging.info("Hello from djCrud")
     return JsonResponse({'message': 'This is the crud endpoint.'})
 
-def send_notification_emails(collection_name, emails, operation_type, entity_id, metadata):
+def send_notification_emails(collection_name, emails, operation_type, entity_id, metadata=None):
     task = {
         "type" : NOTIFICATION.TYPE_CRUD ,
         "collection_name" : collection_name,
@@ -94,13 +94,16 @@ def newEntity(request):
                 return JsonResponse({'Error': 'Entity Type not found.'}, status=nSuccessCodes.NOT_FOUND)
 
             # Handle entity creation
-            operation_type, entity_created_key, collection_ref = handle_entity_creation(collection_name, data)
+            operation_type, entity_created_key = handle_entity_creation(collection_name, data)
 
             if collection_name == COLLECTIONS.USER:
                 return create_user_entity(collection_name, operation_type, data, emails, metadata)
+            elif collection_name == COLLECTIONS.USER_KYC:
+                return create_user_kyc(collection_name, operation_type, data, emails, metadata)
 
             # Process user creation for other entity types
             user_id = extract_user_id(request)
+            collection_ref = FIREBASE_DB.collection(collection_name)
             if user_id:
                 user_ref, user_data = get_user_data(user_id)
                 if user_data is None:
@@ -109,7 +112,6 @@ def newEntity(request):
                 if not user_data.get('CreatorMode', False):
                     return JsonResponse({'status': 'error', 'message': "User not a creator."}, status=nSuccessCodes.FORBIDDEN)
 
-                collection_ref = FIREBASE_DB.collection(collection_name)
                 update_time, collection_ref = collection_ref.add(data)
                 update_user_entity_created(user_ref, entity_created_key, collection_ref.id, user_data)
 
@@ -207,8 +209,10 @@ def handle_entity_creation(collection_name, data):
         operation_type = NOTIFICATION.OP_CREATE
     elif collection_name == COLLECTIONS.USER:
         operation_type = NOTIFICATION.OP_SIGN_UP
+    elif collection_name == COLLECTIONS.USER_KYC:
+        operation_type = NOTIFICATION.OP_CREATE
 
-    return operation_type, entity_created_key, collection_ref
+    return operation_type, entity_created_key
 
 def create_user_entity(collection_name, operation_type, data, emails, metadata):
     """Creates a new user entity and returns the response."""
@@ -222,6 +226,18 @@ def create_user_entity(collection_name, operation_type, data, emails, metadata):
         logging.info(f'create_user_entity collection_name {collection_name}, emails {emails},operation_type {operation_type} ,User Id {user_id},metadata {metadata}')
         send_notification_emails(collection_name, emails, operation_type , collection_ref.id, metadata)
         return JsonResponse({'status': 'success', 'message': 'Entity added successfully', 'id': collection_ref.id}, status=nSuccessCodes.CREATED)
+    else:
+        return JsonResponse({'status': 'success', 'message': 'Failure no proper gmail.'}, status=nSuccessCodes.FAILURE)
+
+def create_user_kyc(collection_name, operation_type, data, emails, metadata):
+    user_id = metadata.get('user_id',None)
+    user_name = data.get('first_name', None)
+    if emails and is_valid_entity_type(collection_name) and user_id:
+        entity_id = user_id + "_Kyc"
+        collection_ref = FIREBASE_DB.collection(collection_name).document(entity_id)
+        collection_ref.set(data)
+        send_notification_emails(collection_name, emails, operation_type , entity_id, metadata)
+        return JsonResponse({'status': 'success', 'message': 'User Kyc added successfully', 'id': entity_id}, status=nSuccessCodes.CREATED)
     else:
         return JsonResponse({'status': 'success', 'message': 'Failure no proper gmail.'}, status=nSuccessCodes.FAILURE)
 

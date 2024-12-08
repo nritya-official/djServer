@@ -7,6 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from jinja2 import Environment, FileSystemLoader, Template
 from utils.flags import get_celery_broker_url
+from utils.env_loader import base_web_url
 
 logging.basicConfig(level=logging.INFO)
 #logger = logging.getLogger(__name__)
@@ -30,6 +31,7 @@ def generate_tbus(email_data):
     body = None
     url = None
     subject = None
+    base_url = base_web_url()
 
     collection_name = email_data.get('collection_name', None)
     operation_type = email_data.get('operation_type', NOTIFICATION.OP_CREATE)
@@ -45,7 +47,7 @@ def generate_tbus(email_data):
         subject = f'Welcome to Nritya !'
         title = f'Successful Sign Up! Welcome to Nritya!'
         body = f'Welcome to Nritya! You can explore studio, workshops, courses and classes in your city.'
-        url = f'https://nritya-official.github.io/nritya-webApp/#/profile'
+        url = f'{base_url}/#/profile'
         return title, body, url, subject
 
     subject = f'New {collection_name} {operation_type} : {entity_name} !'
@@ -53,14 +55,21 @@ def generate_tbus(email_data):
     body = f'You have successfully added your {collection_name}: {entity_name}.'
 
     if collection_name == COLLECTIONS.STUDIO:
+        subject = f'New {collection_name} Studio : {entity_name} !'
         body = body + "You can now add related workshop, courses, openclasses and gain visibility."
-        url = f"https://nritya-official.github.io/nritya-webApp/#/studio/{entity_id}"
+        url = f"{base_url}/#/studio/{entity_id}"
     elif collection_name == COLLECTIONS.WORKSHOPS:
-        url = f"https://nritya-official.github.io/nritya-webApp/#/workshop/{entity_id}"
+        subject = f'New {collection_name} Workshop : {entity_name} !'
+        url = f"{base_url}/#/workshop/{entity_id}"
     elif collection_name == COLLECTIONS.COURSES:
-        url = f"https://nritya-official.github.io/nritya-webApp/#/course/{entity_id}"
+        subject = f'New {collection_name} Course : {entity_name} !'
+        url = f"{base_url}/#/course/{entity_id}"
     elif collection_name == COLLECTIONS.OPENCLASSES:
-        url = f"https://nritya-official.github.io/nritya-webApp/#/openClass/{entity_id}"
+        subject = f'New {collection_name} open class : {entity_name} !'
+        url = f"{base_url}/#/openClass/{entity_id}"
+    elif collection_name == COLLECTIONS.USER_KYC:
+        subject = f'Your Profile Verification Details Have Been Successfully Submitted !'
+        url = f"{base_url}/#/profile"
 
     return title, body, url, subject
 
@@ -189,6 +198,11 @@ def load_html_template_adv(title, body, url, subject, operation_type, collection
                     studio_id=metadata.get('studio_id'),
                     studio_street_name=metadata.get('studio_street_name'),
                     studio_city_name=metadata.get('studio_city_name')
+                )
+            elif collection_name == COLLECTIONS.USER_KYC:
+                template = env.get_template('Kyc.html')
+                html_content = template.render(
+                    url=url,
                 )
 
         return html_content
