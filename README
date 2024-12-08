@@ -58,3 +58,5 @@ ayushraj@Y46TH2QMFW djServer % curl -X POST http://localhost:8000/djSms/confirm_
      -d "otp=3384"
 
 {"status": "success", "message": "OTP verified successfully!"}% 
+
+https://stackoverflow.com/questions/58177703/how-to-prevent-ios-13-dark-mode-from-breaking-emails
