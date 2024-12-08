@@ -39,7 +39,6 @@ collection_name_field ={
 
 class Command(BaseCommand):
     help = 'Manages cache updation'
-
     def handle(self, *args, **options):
         interval = 5
         logging.info(f'Scheduling cache update every {interval} minutes...')
@@ -69,6 +68,7 @@ class Command(BaseCommand):
 
 def update_cache(rc):
     logging.info("Cache updating from management....")
+    logging.info(f'FIREBASE_CREDENTIALS:{FIREBASE_CREDENTIALS} | get_storage_bucket_name:{get_storage_bucket_name()}')
     logging.info(rc.keys('*'))
     if not firebase_admin._apps:
         # Initialize Firebase with your credentials
