@@ -18,7 +18,11 @@ import base64
 import os
 import logging
 
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s - Line: %(lineno)d',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 def testEndpoint(request):
     logging.info("Hello from djCrud")
