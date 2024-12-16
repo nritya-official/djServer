@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt  
 from utils.flags import FIREBASE_DB, CELERY_APP
 from utils.env_loader import base_web_url
-from utils.common_utils import is_valid_entity_type, extract_user_id, COLLECTIONS, NOTIFICATION, nSuccessCodes
+from utils.common_utils import is_valid_entity_type, extract_user_id, COLLECTIONS, NOTIFICATION, nSuccessCodes, KYCStatuses
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
 import json
 import logging
@@ -40,6 +40,47 @@ def send_notification_emails(collection_name, emails, operation_type, entity_id,
     logging.info(f'send_notification_emails task {task}')
     CELERY_APP.send_task('tasks.process_email_task', args=[task])
 
+
+@csrf_exempt
+def kycApproval(request, kyc_id):
+    if request.method == 'PUT':
+        try:
+            body = json.loads(request.body)
+            data = body.get('data')
+            status = data.get('status', None)
+            user_id = data.get('UserId', None)
+
+            if not KYCStatuses.is_name_valid(status) or not user_id:
+                return JsonResponse(
+                    {"error": "Invalid data provided."},
+                    status=400,
+                )
+
+            # Fetch user data
+            user_ref, user_data = get_user_data(user_id)
+            emails = user_data.get("Email", None)
+            # Update the KYC document
+            collection_ref = FIREBASE_DB.collection(COLLECTIONS.USER_KYC).document(kyc_id)
+            collection_ref.set(data, merge=True)
+
+            # Handle status-specific updates and notifications
+            if status == KYCStatuses.VERIFICATION_FAILED.value:
+                logging.info("VERIFICATION_FAILED")
+                user_ref_update = FIREBASE_DB.collection(COLLECTIONS.USER).document(user_id)
+                user_ref_update.set({'CreatorMode': False}, merge=True)
+                send_notification_emails(COLLECTIONS.USER_KYC, emails, NOTIFICATION.OP_KYC_REJECTED, kyc_id)
+            elif status == KYCStatuses.VERIFIED.value:
+                user_ref_update = FIREBASE_DB.collection(COLLECTIONS.USER).document(user_id)
+                user_ref_update.set({'CreatorMode': True}, merge=True)
+                send_notification_emails(COLLECTIONS.USER_KYC, emails, NOTIFICATION.OP_KYC_APPROVED, kyc_id)
+
+            # Return success response
+            return JsonResponse({'status': 'success', 'message': 'Status changed', 'id': kyc_id}, status=201)
+
+        except Exception as e:
+            return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method. Only PUT is allowed.'}, status=405)
 
 @csrf_exempt
 def updateEntity(request, entity_id):

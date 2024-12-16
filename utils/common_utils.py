@@ -1,6 +1,7 @@
 import time
 import jwt
 import logging
+from enum import Enum
 
 class COLLECTIONS:
     USER = 'User'
@@ -14,6 +15,21 @@ class COLLECTIONS:
     TRANSACTIONS = 'Transactions'
     FREE_TRIAL_BOOKINGS = 'FreeTrialBookings'
     INSTRUCTORS = 'Instructors'
+
+class KYCStatuses(Enum):
+    SUBMITTED = "Submitted"
+    UNDER_REVIEW = "Under Review"
+    REVIEWED = "Reviewed"
+    VERIFIED = "Verified"
+    VERIFICATION_FAILED = "Verification Failed"
+
+    @classmethod
+    def is_name_valid(cls, status):
+        if status in cls._value2member_map_:
+            return True
+        else:
+            logging.warning(f"Status '{status}' is not found in KYCStatuses.")
+            return False
 
 class STORAGE_FOLDER:
     STUDIO_IMAGES = 'StudioImages'

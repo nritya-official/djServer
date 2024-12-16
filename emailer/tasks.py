@@ -43,32 +43,41 @@ def generate_tbus(email_data):
     if email_metadata :
         entity_name = email_metadata.get('entity_name',None)
 
-    if collection_name == COLLECTIONS.USER:
-        subject = f'Welcome to Nritya !'
-        title = f'Successful Sign Up! Welcome to Nritya!'
-        body = f'Welcome to Nritya! You can explore studio, workshops, courses and classes in your city.'
-        url = f'{base_url}/#/profile'
-        return title, body, url, subject
+    if operation_type == NOTIFICATION.OP_CREATE:
+        if collection_name == COLLECTIONS.USER:
+            subject = f'Welcome to Nritya !'
+            title = f'Successful Sign Up! Welcome to Nritya!'
+            body = f'Welcome to Nritya! You can explore studio, workshops, courses and classes in your city.'
+            url = f'{base_url}/#/profile'
+            return title, body, url, subject
 
-    subject = f'New {collection_name} {operation_type} : {entity_name} !'
-    title = f'{collection_name} {operation_type} successfully'
-    body = f'You have successfully added your {collection_name}: {entity_name}.'
+        subject = f'New {collection_name} {operation_type} : {entity_name} !'
+        title = f'{collection_name} {operation_type} successfully'
+        body = f'You have successfully added your {collection_name}: {entity_name}.'
 
-    if collection_name == COLLECTIONS.STUDIO:
-        subject = f'New {collection_name} Studio : {entity_name} !'
-        body = body + "You can now add related workshop, courses, openclasses and gain visibility."
-        url = f"{base_url}/#/studio/{entity_id}"
-    elif collection_name == COLLECTIONS.WORKSHOPS:
-        subject = f'New {collection_name} Workshop : {entity_name} !'
-        url = f"{base_url}/#/workshop/{entity_id}"
-    elif collection_name == COLLECTIONS.COURSES:
-        subject = f'New {collection_name} Course : {entity_name} !'
-        url = f"{base_url}/#/course/{entity_id}"
-    elif collection_name == COLLECTIONS.OPENCLASSES:
-        subject = f'New {collection_name} open class : {entity_name} !'
-        url = f"{base_url}/#/openClass/{entity_id}"
-    elif collection_name == COLLECTIONS.USER_KYC:
-        subject = f'Your Profile Verification Details Have Been Successfully Submitted !'
+        if collection_name == COLLECTIONS.STUDIO:
+            subject = f'New {collection_name} Studio : {entity_name} !'
+            body = body + "You can now add related workshop, courses, openclasses and gain visibility."
+            url = f"{base_url}/#/studio/{entity_id}"
+        elif collection_name == COLLECTIONS.WORKSHOPS:
+            subject = f'New {collection_name} Workshop : {entity_name} !'
+            url = f"{base_url}/#/workshop/{entity_id}"
+        elif collection_name == COLLECTIONS.COURSES:
+            subject = f'New {collection_name} Course : {entity_name} !'
+            url = f"{base_url}/#/course/{entity_id}"
+        elif collection_name == COLLECTIONS.OPENCLASSES:
+            subject = f'New {collection_name} open class : {entity_name} !'
+            url = f"{base_url}/#/openClass/{entity_id}"
+        elif collection_name == COLLECTIONS.USER_KYC:
+            subject = f'Your Profile Verification Details Have Been Successfully Submitted !'
+            url = f"{base_url}/#/profile"
+    
+    elif operation_type == NOTIFICATION.OP_KYC_REJECTED:
+        subject = f'Profile Verification Update !'
+        url = f"{base_url}/#/profile"
+    
+    elif operation_type == NOTIFICATION.OP_KYC_APPROVED:
+        subject = f'Your Profile Has Been Successfully Verified !'
         url = f"{base_url}/#/profile"
 
     return title, body, url, subject
@@ -146,7 +155,7 @@ def load_html_template_adv(title, body, url, subject, operation_type, collection
     try:
         current_dir = os.path.dirname(os.path.abspath(__file__)) 
         template_dir = os.path.join(current_dir, 'templates')
-        logger.info(f"Loading templates from directory: {template_dir}")
+        logger.debug(f"Loading templates from directory: {template_dir}")
         logger.info(f"title : {title},metadata: {metadata},url: {url}, operation_type{operation_type}")
         env = Environment(loader=FileSystemLoader(template_dir))
         html_content = None
@@ -204,6 +213,18 @@ def load_html_template_adv(title, body, url, subject, operation_type, collection
                 html_content = template.render(
                     url=url,
                 )
+        
+        elif operation_type == NOTIFICATION.OP_KYC_REJECTED:
+            template = env.get_template('Kyc_Failed.html')
+            html_content = template.render(
+                url=url,
+            )
+        
+        elif operation_type == NOTIFICATION.OP_KYC_APPROVED:
+            template = env.get_template('Kyc_Approved.html')
+            html_content = template.render(
+                url=url,
+            )
 
         return html_content
     except Exception as e:
@@ -277,6 +298,14 @@ def process_email_task(email_data):
             operation_type = email_data.get('operation_type', NOTIFICATION.OP_CREATE)
             entity_id = email_data.get('entity_id', None)
             metadata = email_data.get('metadata', None)
+
+            if operation_type in [NOTIFICATION.OP_KYC_APPROVED, NOTIFICATION.OP_KYC_REJECTED]:
+                collection_name = email_data.get(COLLECTIONS.USER_KYC, None)
+                if receiver_email:
+                    title, body, url, subject = generate_tbus(email_data)
+                    send_outlook_email_adv(receiver_email, title, body, url, subject, operation_type, collection_name, entity_id, metadata)
+
+
             if receiver_email and collection_name and entity_id and metadata:
                 title, body, url, subject = generate_tbus(email_data)
                 send_outlook_email_adv(receiver_email, title, body, url, subject, operation_type, collection_name, entity_id, metadata)
