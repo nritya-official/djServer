@@ -60,3 +60,20 @@ ayushraj@Y46TH2QMFW djServer % curl -X POST http://localhost:8000/djSms/confirm_
 {"status": "success", "message": "OTP verified successfully!"}% 
 
 https://stackoverflow.com/questions/58177703/how-to-prevent-ios-13-dark-mode-from-breaking-emails
+
+curl -X PUT http://127.0.0.1:8000/crud/kycApproval/7xvze6bbOeToxjVjd23WvhG3J613_Kyc \
+-H "Content-Type: application/json" \
+-d '{
+    "data": {
+        "status": "Verified",
+        "UserId": "7xvze6bbOeToxjVjd23WvhG3J613"
+    }
+}'
+
+curl -X GET http://127.0.0.1:8000/crud/getKyc/ \
+-H "Content-Type: application/json" \
+-d '{
+    "data": {
+        "status": "Verified", "city":"Patna"
+    }
+}'

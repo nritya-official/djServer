@@ -6,6 +6,7 @@ from utils.flags import FIREBASE_DB, CELERY_APP
 from utils.env_loader import base_web_url
 from utils.common_utils import is_valid_entity_type, extract_user_id, COLLECTIONS, NOTIFICATION, nSuccessCodes, KYCStatuses
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
+from rest_framework.decorators import api_view
 import json
 import logging
 import firebase_admin.firestore
@@ -40,6 +41,61 @@ def send_notification_emails(collection_name, emails, operation_type, entity_id,
     logging.info(f'send_notification_emails task {task}')
     CELERY_APP.send_task('tasks.process_email_task', args=[task])
 
+@api_view(['GET'])
+def getKyc(request):
+    if request.method == 'GET':
+        try:
+            docs = None
+            userId = None
+            status = None
+            city = None
+            kycId = None
+            body = None
+            if request.body:
+                body = json.loads(request.body)
+            else:
+                body = {}
+
+            if body:
+                data = body.get('data',None)
+                status = data.get('status', None)
+                kycId = data.get('kycId', None)
+                #emailId = data.get('emailId', None) # emailId:userId Mapping
+                userId = data.get('userId', None)
+                city = data.get('city', None)
+
+            kyc_ref = FIREBASE_DB.collection(COLLECTIONS.USER_KYC)
+            if userId or status or city:
+                if userId:
+                    docs = kyc_ref.where(filter=FieldFilter("UserId", "==", userId)).stream()
+                elif status and city and KYCStatuses.is_name_valid(status):
+                    query = kyc_ref.where(filter=FieldFilter("status", "==", status)).where(
+                                filter=FieldFilter("city", "==", city))
+                    docs = query.stream()
+                elif status:
+                    docs = kyc_ref.where(filter=FieldFilter("status", "==", status)).stream()
+                elif city:
+                    docs = kyc_ref.where(filter=FieldFilter("city", "==", city)).stream()
+            else:
+                docs = kyc_ref.stream()
+            
+            result = {status.name: {"count": 0, "data": {}} for status in KYCStatuses}
+
+            for doc in docs:
+                doc_data = doc.to_dict()
+                doc_status = doc_data.get("status")
+                if doc_status and KYCStatuses.is_name_valid(doc_status):
+                    status_group = KYCStatuses(doc_status).name
+                    result[status_group]["data"][doc.id] = doc_data
+                    result[status_group]["count"] += 1
+                else:
+                    logging.warning(f"Invalid or missing status for document ID ? {doc.id}: {doc_status}")
+
+            return JsonResponse({"success": True, "data": result})
+
+        except Exception as e:
+            logging.error(f"Error in getKyc: {str(e)}")
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
 
 @csrf_exempt
 def kycApproval(request, kyc_id):
