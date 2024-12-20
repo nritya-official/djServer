@@ -2,11 +2,12 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt  
-from utils.flags import FIREBASE_DB, CELERY_APP
+from utils.flags import FIREBASE_DB, CELERY_APP, STORAGE_BUCKET
 from utils.env_loader import base_web_url
-from utils.common_utils import is_valid_entity_type, extract_user_id, COLLECTIONS, NOTIFICATION, nSuccessCodes, KYCStatuses
+from utils.common_utils import is_valid_entity_type, extract_user_id, COLLECTIONS,STORAGE_FOLDER, CREATOR_KYC_DOCS_FOLDER, NOTIFICATION, nSuccessCodes, KYCStatuses
 from google.cloud.firestore_v1.base_query import FieldFilter, Or
 from rest_framework.decorators import api_view
+import datetime
 import json
 import logging
 import firebase_admin.firestore
@@ -40,6 +41,29 @@ def send_notification_emails(collection_name, emails, operation_type, entity_id,
     }
     logging.info(f'send_notification_emails task {task}')
     CELERY_APP.send_task('tasks.process_email_task', args=[task])
+
+@api_view(['GET'])
+def getKycDoc(request, kyc_id):
+    storageFolder = STORAGE_FOLDER.CREATOR_KYC_DOCS
+    user_id = kyc_id[:-4]
+    path1 = f"{storageFolder}/{user_id}/{CREATOR_KYC_DOCS_FOLDER.AADHAR}/"
+    path2 = f"{storageFolder}/{user_id}/{CREATOR_KYC_DOCS_FOLDER.GST}/"
+    
+    # List the blobs with the given prefix
+    blobs1 = STORAGE_BUCKET.list_blobs(prefix=path1, delimiter="/")
+    blobs2 = STORAGE_BUCKET.list_blobs(prefix=path2, delimiter="/")
+    signed_urls = {}
+
+    for blob1 in blobs1:
+        signed_urls[CREATOR_KYC_DOCS_FOLDER.AADHAR] = blob1.generate_signed_url(datetime.timedelta(seconds=600), method='GET')
+
+    for blob2 in blobs2:
+        signed_urls[CREATOR_KYC_DOCS_FOLDER.GST] = blob2.generate_signed_url(datetime.timedelta(seconds=600), method='GET')
+
+    if signed_urls:
+        return JsonResponse({"success": True, "data": signed_urls}, status=200)
+    else:
+        return JsonResponse({"success": False, "message": "No signed URLs found for Aadhar or Gst documents."}, status=404)
 
 @api_view(['GET'])
 def getKyc(request):
@@ -79,13 +103,13 @@ def getKyc(request):
             else:
                 docs = kyc_ref.stream()
             
-            result = {status.name: {"count": 0, "data": {}} for status in KYCStatuses}
+            result = {status.value: {"count": 0, "data": {}} for status in KYCStatuses}
 
             for doc in docs:
                 doc_data = doc.to_dict()
                 doc_status = doc_data.get("status")
                 if doc_status and KYCStatuses.is_name_valid(doc_status):
-                    status_group = KYCStatuses(doc_status).name
+                    status_group = KYCStatuses(doc_status).value
                     result[status_group]["data"][doc.id] = doc_data
                     result[status_group]["count"] += 1
                 else:
@@ -104,14 +128,14 @@ def kycApproval(request, kyc_id):
             body = json.loads(request.body)
             data = body.get('data')
             status = data.get('status', None)
-            user_id = data.get('UserId', None)
-
+            user_id = kyc_id[:-4]
+            logging.info(f'{status} {user_id} {data} {kyc_id}')
             if not KYCStatuses.is_name_valid(status) or not user_id:
                 return JsonResponse(
                     {"error": "Invalid data provided."},
                     status=400,
                 )
-
+            logging.info('Valid data')
             # Fetch user data
             user_ref, user_data = get_user_data(user_id)
             emails = user_data.get("Email", None)

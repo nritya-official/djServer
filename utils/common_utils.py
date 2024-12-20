@@ -25,6 +25,7 @@ class KYCStatuses(Enum):
 
     @classmethod
     def is_name_valid(cls, status):
+        logging.info(cls._value2member_map_)
         if status in cls._value2member_map_:
             return True
         else:
@@ -35,6 +36,11 @@ class STORAGE_FOLDER:
     STUDIO_IMAGES = 'StudioImages'
     STUDIO_ANNOUNCEMENTS = 'StudioAnnouncements'
     STUDIO_ICON = 'StudioIcon'
+    CREATOR_KYC_DOCS = 'CreatorKycDocuments'
+
+class CREATOR_KYC_DOCS_FOLDER:
+    AADHAR = "Aadhar"
+    GST = "Gst"
 
 class NOTIFICATION:
     OP_CREATE = "added"
