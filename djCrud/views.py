@@ -129,6 +129,11 @@ def kycApproval(request, kyc_id):
                 user_ref_update = FIREBASE_DB.collection(COLLECTIONS.USER).document(user_id)
                 user_ref_update.set({'CreatorMode': True}, merge=True)
                 send_notification_emails(COLLECTIONS.USER_KYC, emails, NOTIFICATION.OP_KYC_APPROVED, kyc_id)
+            else:
+                logging.info(f'Status changed to {status}')
+                user_ref_update = FIREBASE_DB.collection(COLLECTIONS.USER).document(user_id)
+                user_ref_update.set({'CreatorMode': False}, merge=True)
+
 
             # Return success response
             return JsonResponse({'status': 'success', 'message': 'Status changed', 'id': kyc_id}, status=201)
